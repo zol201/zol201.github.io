@@ -1,44 +1,29 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contact - Yun-Rou Lin</title>
+    <title>GGIS517 - Yun-Rou Lin</title>
     <!-- web image -->
     <link rel="icon" type="image/x-icon" href="201.png">
-    <!-- web format -->
-    <link rel="stylesheet" href="style_portofolio.css">
-    <style>
-        .container {
-            max-width: 1000px;
-            margin: 20px auto;
-            padding: 40px;
-            background: rgba(255, 255, 255, 0.75);
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.6);
-            border-radius: 10px;
-            font-family: Verdana, sans-serif;
-        }
-        .contact-info p {
-            margin: 8px 0;
-            font-size: 18px;
-        }
-        .contact-info a {
-            color: #0056a3;
-            text-decoration: none;
-        }
-        .contact-info a:hover {
-            text-decoration: underline;
-        }
-        h2.section-title {
-            margin-top: 30px;
-            text-align: center;
-        }
-    </style>
+    <!-- 1) Leaflet official css -->
+    <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""
+    />
+
+    <!-- 2) leafmap.css -->
+    <link rel="stylesheet" href="leafmap.css">
+
 </head>
-<body class="portfolio-page">
+
+<body>
     <header>
         <img src="201.png" alt="Logo" class="header-logo">
-        <h1>517 Geospatial Visualization</h1>
+        <h1>GGIS517</h1>
     </header>
     <nav>
         <ul>
@@ -50,23 +35,18 @@
         </ul>
     </nav>
 
-    <div class="container">
-        <!-- 聯絡方式 -->
-        <h2 style="text-align: center;">Yun-Rou Lin</h2>
-        <div class="contact-info" style="text-align: center;">
-            <p style="background-color: rgba(255, 255, 255, 0.75); 
-                                border-radius: 8px; 
-                                line-height: 1;"> Tel: +1 (447) 902-7408</p>
-            <p style="background-color: rgba(255, 255, 255, 0.75); 
-                                border-radius: 8px; 
-                                line-height: 1;"> Email: <a href="mailto:yunroul2@illinois.edu">yunroul2@illinois.edu</a> | <a href="mailto:sunnyzol0315@gmail.com">sunnyzol0315@gmail.com</a></p>
-        </div>
+  <h2 style="text-align:center;">Coffee Shop in Champaign, Illinois</h2>
 
+  <!-- map container -->
+  <div id="map"></div>
 
-    </div>
+  <!-- Leaflet JS（一定要在 map div 後面） -->
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""
+  ></script>
+  <script src="leafmap.js"></script>
 
-    <footer>
-        <p>&copy; 2026 Yun-Rou Lin. All Rights Reserved.</p>
-    </footer>
 </body>
 </html>

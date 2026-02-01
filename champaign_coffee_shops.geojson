@@ -1,0 +1,161 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Caffe Paradiso",
+        "address": "801 S Lincoln Ave, Urbana, IL 61801",
+        "description": "Independent cafe serving Intelligentsia coffee since 1998. Popular study spot with rotating art displays.",
+        "type": "independent"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-88.2284, 40.1095]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "BrewLab Coffee",
+        "address": "630 S 5th St, Champaign, IL 61820",
+        "description": "Specialty coffee shop near campus known for unique drinks like the maple miner latte and quality pastries.",
+        "type": "independent"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-88.2318, 40.1103]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Flying Machine Avionics",
+        "address": "202 S 1st St, Champaign, IL 61820",
+        "description": "Locally owned cafe in Midtown Champaign featuring Page Roasting Company coffee roasted on-site.",
+        "type": "independent"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-88.2435, 40.1168]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Mad Goat Coffee",
+        "address": "57 E Main St, Champaign, IL 61820",
+        "description": "Danville-based roaster opened in Downtown Champaign in 2024. Known for nitro brew and Royal Donuts.",
+        "type": "independent"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-88.2395, 40.1182]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "BakeLab Patisserie (Urbana)",
+        "address": "631 E Green St, Champaign, IL 61820",
+        "description": "Artisan pastry shop and coffee bar serving Counter Culture Coffee with creative seasonal pastries.",
+        "type": "independent"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-88.2271, 40.1101]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "BakeLab Patisserie (Lodgic)",
+        "address": "1807 S Neil St, Champaign, IL 61820",
+        "description": "Second BakeLab location inside Lodgic Coworking space.",
+        "type": "independent"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-88.2433, 40.0996]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Espresso Royale - Goodwin",
+        "address": "1117 W Oregon St, Urbana, IL 61801",
+        "description": "Local chain with multiple campus locations. Popular student study spot.",
+        "type": "chain-local"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-88.2241, 40.1063]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Espresso Royale - Springfield",
+        "address": "1301 Springfield Ave, Urbana, IL 61801",
+        "description": "Local chain location near engineering quad.",
+        "type": "chain-local"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-88.2267, 40.1133]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Aroma Cafe",
+        "address": "118 N Walnut St, Champaign, IL 61820",
+        "description": "Downtown Champaign cafe known for breakfast burritos and smoothies.",
+        "type": "independent"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-88.2380, 40.1197]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Cafe Kopi (Gies College of Business)",
+        "address": "515 E Gregory Dr, Champaign, IL 61820",
+        "description": "Campus location of the local coffeehouse inside Gies College of Business.",
+        "type": "independent"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-88.2277, 40.1083]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Pekara Bakery & Bistro",
+        "address": "116 N Neil St, Champaign, IL 61820",
+        "description": "European-style bakery and bistro with coffee and fresh pastries.",
+        "type": "independent"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-88.2434, 40.1194]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Columbia Street Roastery",
+        "address": "119 N Walnut St, Champaign, IL 61820",
+        "description": "Small-batch coffee roaster in Downtown Champaign.",
+        "type": "independent"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-88.2380, 40.1196]
+      }
+    }
+  ]
+}
