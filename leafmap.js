@@ -35,7 +35,7 @@ function popupHTML(props) {
 
 fetch(GEOJSON_PATH)
   .then((res) => {
-    if (!res.ok) throw new Error(`Failed to load ${GEOJSON_PATH} (${res.status})`);
+    if (!res.ok) throw new Error(`Failed to load ${GEOJSON_PATH}`);
     return res.json();
   })
   .then((geojson) => {
@@ -105,10 +105,4 @@ fetch(GEOJSON_PATH)
     const bounds = layer.getBounds();
     if (bounds.isValid()) map.fitBounds(bounds.pad(0.2));
   })
-  .catch((err) => {
-    console.error(err);
-    L.popup()
-      .setLatLng(map.getCenter())
-      .setContent(`Could not load <b>${GEOJSON_PATH}</b>. Check filename/path.`)
-      .openOn(map);
-  });
+  ;

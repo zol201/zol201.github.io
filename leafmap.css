@@ -1,9 +1,10 @@
 /* ======================= Leaflet Map ======================= */
 #map{
-  width: max(60%,60%);
+  width: min(90%, 950px); /* responsive width */
   aspect-ratio: 1.6 / 1;   /* square */
-  margin: 15px auto;
+  margin: 10px auto;
   border-radius: 12px;
+  border: 2px solid rgba(0, 0, 0, 0.25);
 }
 
 /* ======================= Reset / Base ======================= */
