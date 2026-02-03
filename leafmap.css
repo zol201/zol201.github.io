@@ -69,7 +69,7 @@ th:first-child,td:first-child{width:100px;text-align:center;}
 .image-center{
   text-align:center;margin:10px;
   display:flex;flex-direction:column;align-items:center;
-  overflow:hidden; /* 讓內部滿框裁切時不外溢 */
+  overflow:hidden; 
 }
 .image-center h3{margin-top:8px;font-size:18px;color:#333;}
 

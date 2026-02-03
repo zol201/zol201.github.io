@@ -14,7 +14,7 @@ const GEOJSON_PATH = 'champaign_coffee_shops.geojson';
 function colorByType(type) {
   if (type === 'independent') return '#ffc800';   // yellow
   if (type === 'chain-local') return '#fb00d1';   // red
-  return '#6C757D';                               // gray (default)
+  return '#6C757D';                               // gray 
 }
 
 function popupHTML(props) {
