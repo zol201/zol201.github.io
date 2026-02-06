@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>D3 Bar Chart - Loading CSV Data</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 40px; 
+        }
+        .bar { 
+            fill: steelblue; 
+        }
+        .bar:hover { 
+            fill: coral; 
+        }
+        .axis text { 
+            font-size: 12px; 
+        }
+        .axis path, .axis line { 
+            stroke: #ccc; 
+        }
+        .chart-title { 
+            font-size: 18px; 
+            font-weight: bold; 
+        }
+        .error-message {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>D3.js - Loading External CSV Data</h1>
+    <p>This example loads data from an external CSV file. <strong>Important:</strong> You must run this on a local web server (e.g., Live Server in VS Code).</p>
+    <div id="chart"></div>
+
+    <script>
+        // Load data from CSV file
+        d3.csv("cities.csv").then(function(data) {
+            // Convert string values to numbers
+            data.forEach(d => {
+                d.population = +d.population;  // The + converts to number
+                d.latitude = +d.latitude;
+                d.longitude = +d.longitude;
+            });
+
+            // Log data to console for inspection
+            console.log("Loaded data:", data);
+
+            // Now create the visualization
+            createChart(data);
+        }).catch(function(error) {
+            console.error("Error loading data:", error);
+            d3.select("#chart")
+                .append("p")
+                .attr("class", "error-message")
+                .text("Error loading CSV file. Make sure you're running a local web server and the cities.csv file is in the same directory.");
+        });
+
+        function createChart(data) {
+            const width = 600;
+            const height = 400;
+            const margin = { top: 40, right: 30, bottom: 80, left: 60 };
+            const innerWidth = width - margin.left - margin.right;
+            const innerHeight = height - margin.top - margin.bottom;
+
+            const svg = d3.select("#chart")
+                .append("svg")
+                .attr("width", width)
+                .attr("height", height);
+
+            // Chart title
+            svg.append("text")
+                .attr("class", "chart-title")
+                .attr("x", width / 2)
+                .attr("y", 25)
+                .attr("text-anchor", "middle")
+                .text("City Populations");
+
+            const chart = svg.append("g")
+                .attr("transform", `translate(${margin.left}, ${margin.top})`);
+
+            // Scales
+            const xScale = d3.scaleBand()
+                .domain(data.map(d => d.city))
+                .range([0, innerWidth])
+                .padding(0.2);
+
+            const yScale = d3.scaleLinear()
+                .domain([0, d3.max(data, d => d.population)])
+                .range([innerHeight, 0])
+                .nice();
+
+            // X Axis with rotated labels
+            chart.append("g")
+                .attr("class", "axis")
+                .attr("transform", `translate(0, ${innerHeight})`)
+                .call(d3.axisBottom(xScale))
+                .selectAll("text")
+                .attr("transform", "rotate(-45)")
+                .attr("text-anchor", "end")
+                .attr("dx", "-0.5em")
+                .attr("dy", "0.5em");
+
+            // Y Axis with formatted tick labels
+            chart.append("g")
+                .attr("class", "axis")
+                .call(d3.axisLeft(yScale)
+                    .tickFormat(d => (d / 1000000).toFixed(1) + "M"));
+
+            // Y Axis label
+            svg.append("text")
+                .attr("transform", "rotate(-90)")
+                .attr("x", -height / 2)
+                .attr("y", 15)
+                .attr("text-anchor", "middle")
+                .attr("font-size", "12px")
+                .text("Population");
+
+            // Bars
+            chart.selectAll(".bar")
+                .data(data)
+                .join("rect")
+                .attr("class", "bar")
+                .attr("x", d => xScale(d.city))
+                .attr("y", d => yScale(d.population))
+                .attr("width", xScale.bandwidth())
+                .attr("height", d => innerHeight - yScale(d.population));
+        }
+    </script>
+</body>
+</html>

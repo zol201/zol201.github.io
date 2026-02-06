@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>D3.js Lab - Starter Template</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+        }
+        .chart-container {
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>D3.js Introduction Lab</h1>
+    <div id="chart" class="chart-container"></div>
+    
+    <script>
+        // Verify D3 is loaded
+        console.log("D3 version:", d3.version);
+
+        // Basic D3 selection example
+        d3.select("#chart")
+            .append("p")
+            .text("D3 is working! Check the console for the version number.");
+
+        // Simple SVG example
+        const svg = d3.select("#chart")
+            .append("svg")
+            .attr("width", 400)
+            .attr("height", 200)
+            .style("background-color", "#f0f0f0");
+
+        // Add a circle
+        svg.append("circle")
+            .attr("cx", 100)
+            .attr("cy", 100)
+            .attr("r", 40)
+            .attr("fill", "steelblue");
+
+        // Add a rectangle
+        svg.append("rect")
+            .attr("x", 200)
+            .attr("y", 60)
+            .attr("width", 80)
+            .attr("height", 80)
+            .attr("fill", "coral");
+
+        // Add text
+        svg.append("text")
+            .attr("x", 200)
+            .attr("y", 180)
+            .attr("font-size", "14px")
+            .text("Basic SVG shapes");
+    </script>
+</body>
+</html>
