@@ -52,6 +52,30 @@ nav ul li a{
 }
 nav ul li a:hover{text-decoration:underline;}
 
+/* =================== GGIS517 Sub Nav =================== */
+.sub-nav ul{
+  display:flex;
+  justify-content:center;
+  list-style:none;
+  background:#d8e4e3;   /* lighter than main nav */
+  padding:6px 0;
+}
+
+.sub-nav ul li{
+  margin:0 20px;
+}
+
+.sub-nav ul li a{
+  color:rgb(24, 79, 79);
+  text-decoration:none;
+  font-size:14px;       /* smaller text */
+  font-family:Verdana;
+}
+
+.sub-nav ul li a:hover{
+  text-decoration:underline;
+}
+
 /* ======================= Tables ======================= */
 table{width:min(1000px,95%);margin:40px auto;border-collapse:collapse;}
 th,td{
