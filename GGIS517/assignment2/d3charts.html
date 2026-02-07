@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>D3.js Lab</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+        }
+        .chart-container {
+            margin: 20px 0;
+            display: flex;
+            justify-content: center; /* horizontally center the SVG */
+        }
+
+        svg {
+            background-color: #f0f0f0; /* light gray background */
+        }
+    </style>
+</head>
+<body>
+    <h1 style="text-align: center;">D3.js Introduction Lab</h1>
+    <div style="text-align: center; margin-bottom: 20px;">
+        <a href="../../GGIS517_assign2.html" style="
+            display: inline-block;
+            padding: 8px 16px;
+            background-color: #666;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 14px;
+        ">
+            ← Back to GGIS517 Assignment 2
+        </a>
+    </div>
+    <div id="chart" class="chart-container"></div>
+    
+    <script>
+        // Your D3 code will go here
+        console.log("D3 version:", d3.version);
+
+        // =====================
+        // Setup: select the container div where we will insert SVGs
+        // =====================
+        const container = d3.select("#chart");
+
+        // SVG 1 is commented out because it is a basic D3 shape demo.
+        /*
+        // =====================
+        // SVG 1: Basic D3 selections + appending SVG shapes
+        // Goal: practice selecting a DOM element (#chart), creating an SVG,
+        // and appending basic SVG shapes (circle + rectangle) with attributes.
+        // Output: one light-gray SVG with a blue circle and a coral rectangle.
+        // =====================
+        //SVG1 for rectangles and circle & square
+        // Create the first SVG canvas
+        const svg1 = container.append("svg")
+            .attr("width", 600)
+            .attr("height", 400)
+            .style("background-color", "#f0f0f0");
+
+
+        // Add a circle (fixed position + size)
+        svg1.append("circle")
+            .attr("cx", 100)
+            .attr("cy", 100)
+            .attr("r", 50)
+            .attr("fill", "steelblue");
+
+        // Add a rectangle (fixed position + size)
+        svg1.append("rect")
+            .attr("x", 200)
+            .attr("y", 50)
+            .attr("width", 100)
+            .attr("height", 100)
+            .attr("fill", "coral");
+        */
+
+        // =====================
+        // Data used for SVG 2 (circles) and SVG 3 (bar chart)
+        // Each object has a categorical label (state) and a numeric value (population).
+        // =====================
+        // Sample data: Population of US states (in millions, 2020 Census)
+        const data = [
+            { state: "California", population: 39.5 },
+            { state: "Texas", population: 29.1 },
+            { state: "Florida", population: 21.5 },
+            { state: "New York", population: 20.2 },
+            { state: "Pennsylvania", population: 13.0 },
+            { state: "Illinois", population: 12.8 }
+        ];
+
+        // SVG 2 is commented out because it is a data-binding practice example.
+        /*
+        // =====================
+        // SVG 2: Data binding practice (one circle per data row)
+        // Goal: practice .data() + .join() to create a mark for each item.
+        // Encoding:
+        //  - cx: horizontal position based on index (even spacing)
+        //  - cy: constant (all circles aligned)
+        //  - r : population (bigger population => bigger circle)
+        // Output: one SVG with 6 circles in a row.
+        // Note: This is NOT the bar chart yet — it is a data-binding example.
+        // =====================
+        //SVG2 for circles based on CSV data
+        // Create the second SVG canvas
+        const svg2 = d3.select("#chart")
+            .append("svg")
+            .attr("width", 600)
+            .attr("height", 300);
+
+        // Bind data to circles (creates one circle per state)
+        svg2.selectAll("circle")
+            .data(data)
+            //.enter()
+            //.append("circle")
+            .join("circle")
+            .attr("cx", (d, i) => 50 + i * 90)
+            .attr("cy", 150)
+            .attr("r", d => d.population)
+            .attr("fill", "steelblue")
+            .attr("opacity", 0.7);
+        */
+
+        // Define the chart dimensions
+        const width = 600;
+        const height = 400;
+        const margin = { top: 20, right: 30, bottom: 40, left: 100 };
+        const innerWidth = width - margin.left - margin.right;
+        const innerHeight = height - margin.top - margin.bottom;
+
+        // Create scales
+        const xScale = d3.scaleLinear()
+            .domain([0, d3.max(data, d => d.population)])  // Input: 0 to max population
+            .range([0, innerWidth]);                        // Output: 0 to chart width
+
+        const yScale = d3.scaleBand()
+            .domain(data.map(d => d.state))  // Input: array of state names
+            .range([0, innerHeight])          // Output: 0 to chart height
+            .padding(0.2);                    // Space between bars
+
+        //SVG3 for bar chart
+        const svg3 = d3.select("#chart")
+            .append("svg")
+            .attr("width", width)
+            .attr("height", height);
+
+        // Create a group for the chart area, translated by the margins
+        const chartArea = svg3.append("g")
+            .attr("transform", `translate(${margin.left}, ${margin.top})`);
+
+        // Draw bars (one rect per state)
+        chartArea.selectAll("rect")
+            .data(data)
+            .join("rect")
+            .attr("x", 0)
+            .attr("y", d => yScale(d.state))
+            .attr("width", d => xScale(d.population))
+            .attr("height", yScale.bandwidth())
+            .attr("fill", "steelblue")
+            .on("mouseover", function () { d3.select(this).attr("fill", "coral"); })
+            .on("mouseout", function () { d3.select(this).attr("fill", "steelblue"); });
+
+        // Add axes
+        const xAxis = d3.axisBottom(xScale).ticks(6);
+        const yAxis = d3.axisLeft(yScale);
+
+        chartArea.append("g")
+            .attr("transform", `translate(0,${innerHeight})`)
+            .call(xAxis);
+
+        chartArea.append("g")
+            .call(yAxis);
+
+        // Optional: x-axis label
+        svg3.append("text")
+            .attr("x", margin.left + innerWidth / 2)
+            .attr("y", height - 10)
+            .attr("text-anchor", "middle")
+            .style("font-size", "12px")
+            .text("Population (millions)");
+
+
+
+
+    </script>
+</body>
+</html>
