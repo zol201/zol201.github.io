@@ -18,6 +18,94 @@
     <!-- 2) leafmap.css -->
     <link rel="stylesheet" href="leafmap.css">
 
+    <!-- D3 v7 -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+      /* Tooltip pop-up */
+      .tooltip {
+        position: absolute;
+        pointer-events: none;
+        background: rgba(0, 0, 0, 0.8);
+        color: #fff;
+        padding: 8px 10px;
+        border-radius: 6px;
+        font-size: 12px;
+        line-height: 1.3;
+        opacity: 0;
+        transition: opacity 120ms ease-in-out;
+        max-width: 220px;
+        z-index: 9999;
+      }
+
+      /* Optional: make bars show a pointer cursor */
+      .bar { cursor: pointer; }
+
+    .container {
+        max-width: 1250px;
+        margin: 20px auto;
+        padding: 40px;
+        background: rgba(255, 255, 255, 0.75);
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.6);
+        border-radius: 10px;
+        font-family: Verdana, sans-serif;
+    }
+    .contact-info p {
+        margin: 8px 0;
+        font-size: 18px;
+    }
+    .contact-info a {
+        color: #0056a3;
+        text-decoration: none;
+    }
+    .contact-info a:hover {
+        text-decoration: underline;
+    }
+
+    /* Remove bullets and center assignment links */
+    .panel ul {
+      list-style: none;
+      padding-left: 0;
+      margin: 10px 0 20px 0;
+      text-align: center;
+    }
+
+    .panel ul li {
+      margin: 6px 0;
+    }
+
+    /* Center the D3 chart title */
+    .chart-title {
+      text-anchor: middle;
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .chart-description {
+      margin-top: 20px;
+      font-size: 14px;
+      line-height: 1.6;
+      color: #333;
+    }
+
+    .chart-description h3 {
+      margin-bottom: 8px;
+      font-size: 16px;
+    }
+
+    .chart-description .data-source {
+      margin-top: 10px;
+      font-size: 13px;
+    }
+
+    .chart-description a {
+      color: #0056a3;
+      text-decoration: none;
+    }
+
+    .chart-description a:hover {
+      text-decoration: underline;
+    }
+    </style>
 </head>
 
 <body>
@@ -41,7 +129,9 @@
     </ul>
     </nav>
 
-    <h2 style="text-align:center;">Assignment 2 : D3.js Lab</h2>
+    <div class="container">
+      <div class="panel">
+        <h2 style="text-align:center;">Assignment 2 : D3.js Lab</h2>
         <ul>
             <!--
             <li style="text-align: center;"><a href="GGIS517/assignment2/bar-chart.html">Bar Chart</a></li>
@@ -49,9 +139,173 @@
             <li style="text-align: center;"><a href="GGIS517/assignment2/d3-starter.html">D3 Starter</a></li>
             -->
             <li style="text-align: center;"><a href="GGIS517/assignment2/d3charts.html">D3 Charts - assignment2 part 1</a></li>
+            <li style="text-align: center;"><a href="GGIS517/assignment2/csv-chart.html">D3 Charts - assignment2 part 2</a></li>
         </ul>
-        </nav>
+        <div id="chart" style="display:flex; justify-content:center; margin: 20px 0;"></div>
 
+        <!-- Explanation / Data Source -->
+        <div class="chart-description">
+          <h3 style="text-align: center;">About this visualization</h>
+          <p style="text-align: left; font-size: 15px; font-family: Verdana, Geneva, Tahoma, sans-serif; background-color: transparent;">
+            This bar chart shows the <strong>average annual precipitation </strong>by U.S. state,
+            measured in inches. Each bar represents one state, and states are ordered by
+            precipitation rank, with lower ranks indicating higher average precipitation.
+          </p>
+          <p style="text-align: left; font-size: 15px; font-family: Verdana, Geneva, Tahoma, sans-serif; background-color: transparent;" class="data-source">
+            <strong>Data source:</strong>
+            <a style="text-align: left; font-size: 15px; font-family: Verdana, Geneva, Tahoma, sans-serif; background-color: transparent;" href="https://www.currentresults.com/Weather/US/average-annual-state-precipitation.php" target="_blank" rel="noopener noreferrer">
+              Current Results – Average Annual State Precipitation
+            </a>
+          </p>
+        </div>
+      </div>
+    </div>
+    
+
+
+    <script>
+        // Load data from CSV file
+        d3.csv("GGIS517/assignment2/percipitationdata.csv").then(function(data) {
+            // Convert string values to numbers (match CSV headers)
+            data.forEach(d => {
+                d.Inches = +d.Inches;
+                d.Millimetres = +d.Millimetres;
+                d.Rank = +d.Rank;
+            });
+
+            // Log data to console for inspection
+            console.log("Loaded data:", data);
+
+            // Now create the visualization
+            createChart(data);
+        }).catch(function(error) {
+            console.error("Error loading data:", error);
+            d3.select("#chart")
+                .append("p")
+                .attr("class", "error-message")
+                .text("Error loading CSV file. Make sure you're running Live Server (or GitHub Pages) and that GGIS517/assignment2/percipitationdata.csv exists.");
+        });
+
+        function createChart(data) {
+            // Sort data by Rank (1 = highest precipitation)
+            data.sort((a, b) => d3.ascending(a.Rank, b.Rank));
+
+            // Tooltip (one shared div for the whole page)
+            const tooltip = d3.select("body")
+              .selectAll("div.tooltip")
+              .data([null])
+              .join("div")
+              .attr("class", "tooltip");
+
+            // Selected state for click-to-highlight
+            let selectedState = null;
+
+            function baseFill(d) {
+              return (selectedState === d.Abbreviation) ? "#ff7f0e" : "steelblue";
+            }
+
+            const width = 1200;
+            const height = 600;
+            const margin = { top: 40, right: 30, bottom: 80, left: 60 };
+            const innerWidth = width - margin.left - margin.right;
+            const innerHeight = height - margin.top - margin.bottom;
+
+            const svg = d3.select("#chart")
+                .append("svg")
+                .attr("width", width)
+                .attr("height", height);
+
+            // Chart title
+            svg.append("text")
+                .attr("class", "chart-title")
+                .attr("x", width / 2)
+                .attr("y", 28)
+                .text("Average Annual Precipitation by State (inches)");
+
+            const chart = svg.append("g")
+                .attr("transform", `translate(${margin.left}, ${margin.top})`);
+
+            // Scales
+            const xScale = d3.scaleBand()
+                .domain(data.map(d => d.Abbreviation))
+                .range([0, innerWidth])
+                .padding(0.2);
+
+            const yScale = d3.scaleLinear()
+                .domain([0, d3.max(data, d => d.Inches)])
+                .range([innerHeight, 0])
+                .nice();
+
+            // X Axis with rotated labels
+            chart.append("g")
+                .attr("class", "axis")
+                .attr("transform", `translate(0, ${innerHeight})`)
+                .call(d3.axisBottom(xScale))
+                .selectAll("text")
+                .attr("transform", "rotate(-45)")
+                .attr("text-anchor", "end")
+                .attr("dx", "-0.5em")
+                .attr("dy", "0.5em");
+
+            // Y Axis with formatted tick labels
+            chart.append("g")
+                .attr("class", "axis")
+                .call(d3.axisLeft(yScale));
+
+            // Y Axis label
+            svg.append("text")
+                .attr("transform", "rotate(-90)")
+                .attr("x", -height / 2)
+                .attr("y", 18)
+                .attr("text-anchor", "middle")
+                .attr("font-size", "12px")
+                .text("Average annual precipitation (inches)");
+
+            // Bars + interactivity (tooltip + click-to-select)
+            const bars = chart.selectAll(".bar")
+              .data(data)
+              .join("rect")
+              .attr("class", "bar")
+              .attr("x", d => xScale(d.Abbreviation))
+              .attr("y", d => yScale(d.Inches))
+              .attr("width", xScale.bandwidth())
+              .attr("height", d => innerHeight - yScale(d.Inches))
+              .attr("fill", d => baseFill(d));
+
+            // Hover: show tooltip + temporary highlight (if not selected)
+            bars
+              .on("mouseover", function (event, d) {
+                if (selectedState !== d.Abbreviation) d3.select(this).attr("fill", "coral");
+
+                tooltip
+                  .style("opacity", 1)
+                  .html(
+                    `<div><strong>${d.State}</strong></div>` +
+                    `<div>Avg precip: ${d.Inches.toFixed(1)} in</div>` +
+                    `<div>Avg precip: ${d.Milli_metres} mm</div>` +
+                    `<div>Rank: ${d.Rank}</div>`
+                  );
+              })
+              .on("mousemove", function (event) {
+                // Position tooltip near cursor
+                tooltip
+                  .style("left", (event.pageX + 12) + "px")
+                  .style("top", (event.pageY + 12) + "px");
+              })
+              .on("mouseout", function (event, d) {
+                // Restore fill + hide tooltip
+                d3.select(this).attr("fill", baseFill(d));
+                tooltip.style("opacity", 0);
+              })
+              .on("click", function (event, d) {
+                // Toggle selection
+                selectedState = (selectedState === d.Abbreviation) ? null : d.Abbreviation;
+
+                // Update all bar colors
+                bars.attr("fill", dd => baseFill(dd));
+              });
+        }
+    </script>
 
    <!-- footer -->
   <footer>
