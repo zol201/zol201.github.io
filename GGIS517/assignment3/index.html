@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>D3 + Leaflet: Linked Views Lab</title>
+
+    <!-- Leaflet CSS - MUST come before your own CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    <!-- Your custom CSS -->
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Libraries -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+</head>
+<body>
+
+    <!-- Page layout: map on left, chart panel on right -->
+    <div id="container">
+        <div id="map"></div>
+        <div id="panel">
+            <div id="panel-header">
+                <h2>Midwest Cities Dashboard</h2>
+                <p>Hover over a bar or map symbol to highlight across views</p>
+            </div>
+            <div id="controls">
+                <label for="attribute-select">Chart attribute:</label>
+                <select id="attribute-select">
+                    <option value="population">Population</option>
+                    <option value="density">Density (per sq mi)</option>
+                    <option value="area_sq_mi">Area (sq mi)</option>
+                    <option value="founded">Year Founded</option>
+                </select>
+            </div>
+            <div id="chart-container">
+                <div id="chart"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Shared tooltip -->
+    <div class="tooltip" id="tooltip"></div>
+
+    <!-- Load data from external file -->
+    <script src="data.js"></script>
+
+    <!-- Map and chart JavaScript -->
+    <script>
+
+        // ============================================
+        // TOOLTIP HELPER
+        // Provided — no changes needed
+        // ============================================
+        const tooltip = d3.select("#tooltip");
+
+        function showTooltip(event, html) {
+            tooltip
+                .html(html)
+                .style("left", (event.pageX + 12) + "px")
+                .style("top", (event.pageY - 12) + "px")
+                .style("opacity", 1);
+        }
+
+        function hideTooltip() {
+            tooltip.style("opacity", 0);
+        }
+
+        // Number formatter
+        const fmt = d3.format(",");
+
+
+        // ============================================
+        // PART 1: LEAFLET MAP INITIALIZATION
+        //
+        // TODO 1: Initialize a Leaflet map.
+        //
+        // Create a Leaflet map in the "map" div,
+        // centered on the Midwest (approx 41.5, -86.0)
+        // at zoom level 6. Then add a basemap tile layer.
+        //
+        // Refer to your previous lab for the syntax.
+        // Use the CARTO light basemap:
+        //   https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png
+        //
+        // Store it in a variable called "map".
+        // Remember to include attribution.
+        // ============================================
+
+        const map = L.map("map").setView([41.5, -86.0], 6);
+        L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+        }).addTo(map);
+    
+
+
+        // ============================================
+        // PART 2: SVG OVERLAY FOR D3
+        //
+        // Provided — this creates the SVG layer that
+        // D3 will draw into on top of the Leaflet map.
+        //
+        // L.svg() adds an SVG element to the map.
+        // d3.select() grabs it so D3 can draw inside it.
+        // The <g> group is where your circles will go.
+        // ============================================
+
+        L.svg().addTo(map);
+        const svg = d3.select("#map").select("svg");
+        const g = svg.append("g").attr("class", "leaflet-zoom-hide");
+
+
+        // ============================================
+        // PART 3: PROJECTION FUNCTION AND RADIUS SCALE
+        //
+        // TODO 2a: Write a function called projectPoint
+        //          that takes lat and lng as arguments and
+        //          returns an object with x and y properties.
+        //
+        //          Use map.latLngToLayerPoint() to convert
+        //          geographic coordinates to pixel coordinates.
+        //          (Same function from the previous lab.)
+        //
+        // TODO 2b: Create a variable called radiusScale
+        //          using d3.scaleSqrt(). The domain should
+        //          go from 0 to the maximum population in
+        //          cityData. The range should go from 5 to 22.
+        // ============================================
+
+        // TODO 2a: Your projectPoint function here
+        function projectPoint(lat, lng) {
+            const point = map.latLngToLayerPoint([lat, lng]);
+            return { x: point.x, y: point.y };
+        } // Note: This function converts latitude and longitude to pixel coordinates on the map using Leaflet's latLngToLayerPoint method.
+
+        // TODO 2b: Your radiusScale here
+        const radiusScale = d3.scaleSqrt()
+            .domain([0, d3.max(cityData, d => d.population)])
+            .range([5, 22]);
+        // Note: This scale maps city population to circle radius, with a square root scale to better handle large population differences.
+
+        // ============================================
+        // PART 4: RENDER MAP SYMBOLS
+        //
+        // TODO 3: Write a renderMap() function.
+        //
+        // This function should:
+        //   - Select all ".data-point" elements in g
+        //   - Bind cityData using d.name as the key
+        //   - Use .join("circle") to create/update circles
+        //   - Set class to "data-point"
+        //   - Set cx and cy using projectPoint()
+        //   - Set r using radiusScale(d.population)
+        //   - Add a mouseover handler that calls
+        //     highlightCity(d.name) and showTooltip()
+        //   - Add a mouseout handler that calls
+        //     clearHighlight() and hideTooltip()
+        //
+        // After defining the function, register it on
+        // Leaflet's "zoomend", "viewreset", and "moveend"
+        // events so circles reposition when the map moves.
+        // ============================================
+
+        // TODO 3: Your renderMap function here
+
+        function renderMap() {
+            g.selectAll(".data-point")
+                .data(cityData, d => d.name)
+                .join("circle")
+                .attr("class", "data-point")
+                .attr("cx", d => projectPoint(d.lat, d.lng).x) // Note: This sets the x-coordinate of the circle based on the projected longitude.
+                .attr("cy", d => projectPoint(d.lat, d.lng).y) // Note: This sets the y-coordinate of the circle based on the projected latitude.
+                .attr("r", d => radiusScale(d.population)) // Note: This sets the radius of the circle based on the city's population using the radiusScale defined earlier.
+                .on("mouseover", (event, d) => {
+                    highlightCity(d.name);
+                    showTooltip(
+                        event,
+                        `<strong>${d.name}, ${d.state}</strong><br>Population: ${fmt(d.population)}`
+                    );
+                }) // Note: This adds a mouseover event listener to each circle that highlights the city and shows a tooltip with the city's name, state, and population.
+                .on("mouseout", () => {
+                    clearHighlight();
+                    hideTooltip();
+                });
+        }
+
+
+        // TODO 3 (continued): Register map event listeners here
+        map.on("zoomend", renderMap);
+        map.on("viewreset", renderMap);
+        map.on("moveend", renderMap);
+
+
+        // ============================================
+        // PART 5: BAR CHART SETUP
+        //
+        // Provided — chart container, margins, and
+        // bar dimensions. You will create the scales
+        // and drawing function below.
+        // ============================================
+        const chartMargin = { top: 10, right: 20, bottom: 10, left: 90 };
+        const chartWidth = 340 - chartMargin.left - chartMargin.right;
+        const barHeight = 28;
+        const barPadding = 4;
+
+        // Chart SVG
+        const chartSvg = d3.select("#chart")
+            .append("svg")
+            .attr("width", chartWidth + chartMargin.left + chartMargin.right);
+
+        const chartG = chartSvg.append("g")
+            .attr("transform", `translate(${chartMargin.left},${chartMargin.top})`);
+
+        // Track current attribute (from dropdown)
+        let currentAttribute = "population";
+
+
+        // ============================================
+        // PART 6: CHART SCALES AND UPDATE FUNCTION
+        //
+        // TODO 4a: Create xScale using d3.scaleLinear()
+        //          with range [0, chartWidth].
+        //
+        // TODO 4b: Create yScale using d3.scaleBand()
+        //          with .padding(0.15).
+        //
+        // TODO 4c: Complete the updateChart() function.
+        //          The sorting, sizing, and data join are
+        //          provided. You need to:
+        //            - Set scale domains
+        //            - Set bar width, labels, values
+        //            - Add mouse event handlers
+        // ============================================
+
+        // TODO 4a: Your xScale here
+        const xScale = d3.scaleLinear()
+            .range([0, chartWidth]);
+
+        // TODO 4b: Your yScale here
+        const yScale = d3.scaleBand()
+            .padding(0.15);
+
+        function updateChart() {
+            const attr = currentAttribute;
+
+            // Sort data descending by current attribute
+            const sorted = [...cityData].sort((a, b) => b[attr] - a[attr]);
+
+            // Size the chart based on number of cities
+            const chartHeight = sorted.length * (barHeight + barPadding);
+            chartSvg.attr("height", chartHeight + chartMargin.top + chartMargin.bottom);
+
+            // TODO: Set xScale.domain() and yScale.domain() / .range()
+            xScale
+                .domain([0, d3.max(sorted, d => d[attr])])
+                .nice();
+
+            yScale
+                .domain(sorted.map(d => d.name))
+                .range([0, chartHeight]);
+
+            // Data join — provided
+            const groups = chartG.selectAll(".bar-group")
+                .data(sorted, d => d.name)
+                .join(
+                    enter => {
+                        const grp = enter.append("g").attr("class", "bar-group");
+                        grp.append("rect").attr("class", "bar");
+                        grp.append("text").attr("class", "bar-label");
+                        grp.append("text").attr("class", "value-label");
+                        return grp;
+                    }
+                );
+
+            // Position each group vertically
+            groups.attr("transform", d => `translate(0, ${yScale(d.name)})`);
+
+            // TODO: Update the bar <rect> — set x, y, height, and width
+            groups.select(".bar")
+                .attr("x", 0)
+                .attr("y", 0)
+                .attr("height", yScale.bandwidth())
+                .attr("width", d => xScale(d[attr]));
+
+            // TODO: Update the city name label
+            groups.select(".bar-label")
+                .attr("x", -6)
+                .attr("y", yScale.bandwidth() / 2)
+                .attr("text-anchor", "end")
+                .attr("dominant-baseline", "central")
+                .text(d => d.name);
+
+            // TODO: Update the value label
+            groups.select(".value-label")
+                .attr("x", d => xScale(d[attr]) + 6)
+                .attr("y", yScale.bandwidth() / 2)
+                .attr("dominant-baseline", "central")
+                .text(d => fmt(d[attr]));
+
+            // TODO: Add mouseover/mouseout handlers to the bars
+            groups.select(".bar")
+                .on("mouseover", (event, d) => {
+                    highlightCity(d.name);
+                    showTooltip(
+                        event,
+                        `<strong>${d.name}, ${d.state}</strong><br>${attr}: ${fmt(d[attr])}`
+                    );
+                })
+                .on("mouseout", () => {
+                    clearHighlight();
+                    hideTooltip();
+                });
+        }
+
+
+        // ============================================
+        // PART 7: LINKED HIGHLIGHTING
+        //
+        // TODO 5: Complete highlightCity() and
+        //         clearHighlight().
+        //
+        // Use D3's .classed() method:
+        //   selection.classed("className", d => condition)
+        //   selection.classed("className", false)
+        // ============================================
+
+        function highlightCity(cityName) {
+            // TODO 5a: Map circles — "highlighted" on match, "dimmed" on others
+            g.selectAll(".data-point")
+                .classed("highlighted", d => d.name === cityName)
+                .classed("dimmed", d => d.name !== cityName);
+
+            // TODO 5b: Chart bars — "highlighted" on match
+            chartG.selectAll(".bar")
+                .classed("highlighted", d => d.name === cityName);
+        }
+
+        function clearHighlight() {
+            // TODO 5c: Remove "highlighted" and "dimmed" from all
+            g.selectAll(".data-point")
+                .classed("highlighted", false)
+                .classed("dimmed", false);
+
+            chartG.selectAll(".bar")
+                .classed("highlighted", false);
+        }
+
+
+        // ============================================
+        // PART 8: DROPDOWN EVENT LISTENER
+        //
+        // TODO 6: When the dropdown changes, update
+        //         currentAttribute and call updateChart().
+        // ============================================
+
+        d3.select("#attribute-select").on("change", function() {
+            // TODO 6: Your code here
+            currentAttribute = this.value;
+            updateChart();
+        });
+
+
+        // ============================================
+        // INITIALIZE — calls your functions to start
+        // ============================================
+        renderMap();
+        updateChart();
+
+    </script>
+</body>
+</html>

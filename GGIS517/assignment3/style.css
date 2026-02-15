@@ -1,0 +1,167 @@
+/* ============================================
+   GGIS 517 - Linked Views Lab
+   style.css
+   ============================================ */
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+
+/* ============================================
+   LAYOUT: Map on the left, chart panel on the right
+   ============================================ */
+#container {
+    display: flex;
+    width: 100%;
+    height: 100vh;
+}
+
+#map {
+    width: 65%;
+    height: 100%;
+}
+
+#panel {
+    width: 35%;
+    height: 100%;
+    background: #f8f9fa;
+    border-left: 2px solid #dee2e6;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+#panel-header {
+    padding: 16px 20px;
+    background: #2c3e50;
+    color: white;
+}
+
+#panel-header h2 {
+    font-size: 16px;
+    margin-bottom: 4px;
+}
+
+#panel-header p {
+    font-size: 12px;
+    color: #bdc3c7;
+}
+
+/* ============================================
+   CHART AREA
+   ============================================ */
+#chart-container {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+#chart svg {
+    width: 100%;
+}
+
+/* Bar styling */
+.bar {
+    fill: #3388ff;
+    cursor: pointer;
+    transition: fill 0.2s ease;
+}
+
+.bar:hover {
+    fill: #ff7800;
+}
+
+.bar.highlighted {
+    fill: #ff7800;
+}
+
+.bar-label {
+    font-size: 12px;
+    fill: #333;
+}
+
+.value-label {
+    font-size: 11px;
+    fill: #666;
+}
+
+.axis text {
+    font-size: 11px;
+}
+
+.axis path,
+.axis line {
+    stroke: #ccc;
+}
+
+/* ============================================
+   MAP SYMBOL STYLING
+   ============================================ */
+.data-point {
+    fill: #3388ff;
+    fill-opacity: 0.7;
+    stroke: #ffffff;
+    stroke-width: 2;
+    cursor: pointer;
+    transition: fill 0.2s ease, fill-opacity 0.2s ease;
+}
+
+.data-point:hover {
+    fill: #ff7800;
+    fill-opacity: 0.9;
+}
+
+.data-point.highlighted {
+    fill: #ff7800;
+    fill-opacity: 0.9;
+    stroke-width: 3;
+}
+
+.data-point.dimmed {
+    fill-opacity: 0.25;
+}
+
+/* ============================================
+   DROPDOWN CONTROL
+   ============================================ */
+#controls {
+    padding: 12px 20px;
+    background: #ecf0f1;
+    border-bottom: 1px solid #dee2e6;
+}
+
+#controls label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-right: 8px;
+}
+
+#attribute-select {
+    padding: 4px 8px;
+    font-size: 13px;
+    border: 1px solid #bdc3c7;
+    border-radius: 4px;
+}
+
+/* ============================================
+   TOOLTIP
+   ============================================ */
+.tooltip {
+    position: absolute;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 12px;
+    pointer-events: none;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    z-index: 2000;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+}
+
+.tooltip strong {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 13px;
+}
