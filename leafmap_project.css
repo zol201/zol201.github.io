@@ -1,10 +1,29 @@
 /* ======================= Leaflet Map ======================= */
 #map{
-  width: 100%; /* responsive width */
+  height: 100vh;
+  width: 70%; /* responsive width */
   aspect-ratio: 2 / 1;   /* square */
   margin: 10px auto;
   border-radius: 12px;
   border: 2px solid rgba(0, 0, 0, 0.25);
+  float :left;
+}
+
+#description-panel {
+  width: 30%;
+  height: 100vh;
+  float: right;
+  padding: 20px;
+  background-color: #f4f4f4;
+  overflow-y: auto;
+  box-shadow: -2px 0 5px rgba(0,0,0,0.1);
+  margin: 10px auto;
+  border-radius: 12px;
+  float :left;
+}
+
+#description-panel h2 {
+  margin-top: 0;
 }
 
 /* ======================= Reset / Base ======================= */
