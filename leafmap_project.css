@@ -1,25 +1,35 @@
-/* ======================= Leaflet Map ======================= */
-#map{
-  height: 100vh;
-  width: 70%; /* responsive width */
-  aspect-ratio: 2 / 1;   /* square */
-  margin: 10px auto;
-  border-radius: 12px;
-  border: 2px solid rgba(0, 0, 0, 0.25);
-  float :left;
+/* ======================= Leaflet Map + Right Panel Layout ======================= */
+#map-layout{
+  display:flex;
+  gap:16px;
+  align-items:stretch;
+  height: 100vh;           /* full viewport height */
+  padding: 10px 16px;
+  box-sizing: border-box;
 }
 
-#description-panel {
-  width: 30%;
-  height: 100vh;
-  float: right;
-  padding: 20px;
-  background-color: #f4f4f4;
+#map{
+  flex: 1 1 auto;
+  height: 100%;
+  min-height: 500px;
+  margin: 0;
+  border: 2px solid rgba(0, 0, 0, 0.25);
+  border-radius: 10px;
+}
+
+#description-panel{
+  width: 360px;
+  height: 100%;
+  padding: 16px;
+  background-color: #ffffff;
   overflow-y: auto;
-  box-shadow: -2px 0 5px rgba(0,0,0,0.1);
-  margin: 10px auto;
-  border-radius: 12px;
-  float :left;
+  box-shadow: -2px 0 8px rgba(0,0,0,0.12);
+  border-radius: 10px;
+  box-sizing: border-box;
+
+  /* ensure panel is clickable above the map if any overlap occurs */
+  position: relative;
+  z-index: 1000;
 }
 
 #description-panel h2 {
@@ -248,4 +258,35 @@ footer p{
   border-radius: 4px;
   border: 1px solid rgba(0, 0, 0, 0.35);
   display: inline-block;
+}
+
+
+/* ======================= Collapse ======================= */
+.collapsible{
+  background-color:#777;
+  color:#fff;
+  cursor:pointer;
+  padding:18px;
+  width:100%;
+  border:none;
+  text-align:left;
+  outline:none;
+  font-size:15px;
+  border-radius: 8px;
+  margin: 8px 0;
+}
+
+.collapsible:hover,
+.collapsible.active{
+  background-color:#555;
+}
+
+/* IMPORTANT: do NOT use display:none here, because JS expands via max-height */
+.content{
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.25s ease;
+  background-color:#f1f1f1;
+  border-radius: 8px;
+  padding: 0 18px;
 }
