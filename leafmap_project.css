@@ -66,7 +66,16 @@ header p{font-size:1.2rem;color:#fff;margin:0;text-align:center;padding:0;}
 /* ======================= Typography ======================= */
 h1{color:#35315a;text-align:center;font-size:30px;margin:0 10px;}
 h2{font-family:Verdana;font-size:20px;font-weight:bold;font-style:italic;color:#04272f;text-align:left;margin:10px 15px;}
-h3{font-family:Verdana;font-size:20px;font-weight:bold;font-style:italic;color:#04272f;text-align:center;margin:0 30px;padding-top: 10px;padding-bottom: 10px;}
+h3{
+  font-family:Verdana;
+  font-size:20px;
+  font-weight:bold;
+  font-style:italic;
+  color:#04272f;
+  text-align:left;
+  margin:10px 0;
+  padding:0;
+}
 p{font-family: Verdana;font-size:20px;text-align:left;}
 
 /* ======================= Nav ======================= */
@@ -216,16 +225,9 @@ footer p{
 }
 @media (max-width: 700px){
   :root{ --pair-img-h: 320px; }
-} 
-
-/* ======================= Responsive tweaks ======================= */
-@media (max-width: 900px){
-  :root{ --pair-img-h: 440px; }
 }
 
-@media (max-width: 700px){
-  :root{ --pair-img-h: 320px; }
-}
+
 
 /* ======================= Leaflet Legend ======================= */
 .legend{
@@ -280,12 +282,40 @@ footer p{
   background-color:#555;
 }
 
-/* IMPORTANT: do NOT use display:none here, because JS expands via max-height */
-.content{
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.25s ease;
+/* Collapsible content (matches HTML class="collapse-content" + JS display toggle) */
+.collapse-content{
+  display:none;
   background-color:#f1f1f1;
-  border-radius: 8px;
-  padding: 0 18px;
+  border-radius:8px;
+  padding:14px 18px;
+  margin-bottom:12px;
+  line-height:1.6;
+}
+
+/* ======================= Tabs (Right Panel) ======================= */
+.tablink{
+  background-color:#555;
+  color:#fff;
+  border:none;
+  outline:none;
+  cursor:pointer;
+  padding:8px 14px;
+  font-size:15px;
+  margin-right:6px;
+  border-radius:6px;
+  display:inline-block;
+}
+
+.tablink:hover{ background-color:#777; }
+
+.tabcontent{
+  display:none;
+  padding:14px 0 0 0;
+  color:#111;
+}
+
+/* Improve readability (prevents "squished" lines) */
+#description-panel p{
+  line-height: 1.45;
+  margin: 10px 0;
 }

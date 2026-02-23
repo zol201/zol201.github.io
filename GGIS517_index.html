@@ -43,26 +43,64 @@
     </ul>
     </nav>
 
-    
-
   <h2 style="text-align:center;">Project Overview</h2>
 
   <!-- Map + Right Panel (same row) -->
   <div id="map-layout">
     <div id="map"></div>
     <div id="description-panel">
-            <h2>TARP</h2>
+        <!-- Tab buttons -->
+        <button class="tablink" onclick="openPage('MapDisplay', this)"id="defaultOpen">Map Display</button>
+        <button class="tablink" onclick="openPage('TARP', this)" id="defaultOpen">TARP</button>
+
+        <!-- Tab content -->
+        <div id="MapDisplay" class="tabcontent">
+            <h3>Map Display</h3>
+            <p>
+              This interactive map visualizes the spatial structure of the TARP system,
+              including deep tunnels and reservoir locations. Users can explore
+              infrastructure components directly on the map.
+            </p>
+        </div>
+        <div id="TARP" class="tabcontent">
             <button type="button" class="collapsible">What is TARP?</button>
-            <div class="content">
-            <p>The Tunnel and Reservoir Plan (TARP), also known as the Chicago Deep Tunnel, is a large-scale infrastructure system designed to reduce flooding and improve water quality in the Chicago region. </p>
-            <p><a href="https://mwrd.org/what-we-do/tunnel-and-reservoir-plan-tarp">Learn more on official website</a></p>
+            <div class="collapse-content">
+              <p>
+                The Tunnel and Reservoir Plan (TARP), also known as the Chicago Deep Tunnel,
+                is a large-scale infrastructure system designed to reduce flooding
+                and improve water quality in the Chicago region.
+              </p>
+              <p>
+                <a href="https://mwrd.org/what-we-do/tunnel-and-reservoir-plan-tarp" target="_blank">
+                  Learn more on official website
+                </a>
+              </p>
             </div>
-             <button type="button" class="collapsible">How TARP Works</button>
-            <div class="content">
-            <p>The Tunnel and Reservoir Plan (TARP), also known as the Chicago Deep Tunnel, is a large-scale infrastructure system designed to reduce flooding and improve water quality in the Chicago region. </p>
-            <p><a href="https://mwrd.org/what-we-do/tunnel-and-reservoir-plan-tarp">Learn more on official website</a></p>
+
+            <button type="button" class="collapsible">How TARP Works</button>
+            <div class="collapse-content">
+              <p>
+                TARP helps prevent flooding by capturing excess stormwater and sewage
+                during heavy rainfall. The water is temporarily stored underground
+                and treated later, instead of overflowing into streets and rivers.
+              </p>
+            </div>
+            <button type="button" class="collapsible">More Information</button>
+            <div class="collapse-content">
+              <p>
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Amet, ipsa atque labore consectetur ratione ad quisquam repellat nostrum, at neque nulla, adipisci repudiandae laboriosam consequuntur dolores voluptatibus. Enim, aperiam ut.
+              </p>
+            </div>
+            <button type="button" class="collapsible">More Information</button>
+            <div class="collapse-content">
+              <p>
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Amet, ipsa atque labore consectetur ratione ad quisquam repellat nostrum, at neque nulla, adipisci repudiandae laboriosam consequuntur dolores voluptatibus. Enim, aperiam ut.
+              </p>
             </div>
         </div>
+
+
+    </div>
   </div>
 
   <!-- Leaflet JS -->
@@ -71,7 +109,7 @@
     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
     crossorigin=""
   ></script>
-  <script src="leafmap_project.js"></script>    
+  <script src="leafmap_project.js"></script>
 
 </body>
 </html>
