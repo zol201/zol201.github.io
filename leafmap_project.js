@@ -22,6 +22,60 @@ function onReady(fn) {
 ======================= */
 let map = null;
 
+// Legend state
+let legendControl = null;
+let legendDiv = null;
+
+// Deterministic color from a string (stable color for each "system")
+function colorFromString(str) {
+  if (!str) return "#666666";
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = str.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  const hue = Math.abs(hash) % 360;
+  return `hsl(${hue}, 70%, 45%)`;
+}
+
+// Render / update legend HTML (uses existing CSS classes in your stylesheet)
+function renderLegend(systems = []) {
+  if (!legendDiv) return;
+
+  const systemsHtml = systems
+    .filter(Boolean)
+    .sort((a, b) => a.localeCompare(b))
+    .map(
+      (s) => `
+        <div class="legend-item">
+          <span class="legend-swatch" style="background:${colorFromString(s)};"></span>
+          ${s}
+        </div>`
+    )
+    .join("");
+
+  legendDiv.innerHTML = `
+    <div class="legend-title">TARP Legend</div>
+
+    <div class="legend-item">
+      <span class="legend-swatch" style="background:#0077ff; border-radius:50%;"></span>
+      Reservoir
+    </div>
+
+    <div class="legend-item">
+      <span class="legend-swatch" style="background:#ff4d4d; border-radius:50%;"></span>
+      WRP
+    </div>
+
+    <hr style="margin:8px 0;">
+
+    <div class="legend-item" style="font-weight:600;">
+      Tunnel systems
+    </div>
+
+    ${systemsHtml || `<div class="legend-item"><em>Loading…</em></div>`}
+  `;
+}
+
 /* Explanation:
    initMap() creates the Leaflet map, adds a basemap, and sets the initial view.
    We keep it in a function so the file is easier to read and maintain.
@@ -36,6 +90,26 @@ function initMap() {
       '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors ' +
       '&copy; <a href="https://carto.com/attributions">CARTO</a>',
   }).addTo(map);
+
+  /* =======================
+     Legend (top-right)
+  ======================= */
+  legendControl = L.control({ position: "topright" });
+
+  legendControl.onAdd = function () {
+    legendDiv = L.DomUtil.create("div", "legend");
+
+    // Prevent clicks on the legend from panning/zooming the map
+    L.DomEvent.disableClickPropagation(legendDiv);
+    L.DomEvent.disableScrollPropagation(legendDiv);
+
+    // Initial legend content (updates after GeoJSON loads)
+    renderLegend([]);
+
+    return legendDiv;
+  };
+
+  legendControl.addTo(map);
 }
 
 /* =======================
@@ -55,23 +129,15 @@ function loadTarpLayers() {
   // Group to hold all GeoJSON layers for combined zoom
   const group = L.featureGroup().addTo(map);
 
+  // Collect unique "system" values for the legend
+  const systemSet = new Set();
+
   // Default line style (used when we don't need categorical styling)
   const defaultLineStyle = {
     color: "#0055ff",
     weight: 3,
     opacity: 0.9,
   };
-
-  // Deterministic color from a string (so each "system" gets a stable color)
-  function colorFromString(str) {
-    if (!str) return "#666666";
-    let hash = 0;
-    for (let i = 0; i < str.length; i++) {
-      hash = str.charCodeAt(i) + ((hash << 5) - hash);
-    }
-    const hue = Math.abs(hash) % 360;
-    return `hsl(${hue}, 70%, 45%)`;
-  }
 
   // Style function for TARP_NEW features by the "system" field
   function tarpStyleBySystem(feature) {
@@ -91,6 +157,13 @@ function loadTarpLayers() {
           // If this is WRPRES, attach popup using "name" field
           const isWRPRES = url.includes("WRPRES.geojson");
           const isTARPNEW = url.includes("TARP_NEW.geojson");
+
+          if (isTARPNEW && data && Array.isArray(data.features)) {
+            data.features.forEach((f) => {
+              const sys = f?.properties?.system;
+              if (sys) systemSet.add(sys);
+            });
+          }
 
           const layer = L.geoJSON(data, {
             style: isTARPNEW ? tarpStyleBySystem : defaultLineStyle,
@@ -153,6 +226,9 @@ function loadTarpLayers() {
       if (group.getLayers().length) {
         map.fitBounds(group.getBounds());
       }
+
+      // Update legend using actual systems from TARP_NEW.geojson
+      renderLegend(Array.from(systemSet));
     })
     .catch((error) => {
       console.error("Error loading GeoJSON layers:", error);
