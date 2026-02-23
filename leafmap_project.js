@@ -1,4 +1,3 @@
-
 /* =========================================================
    leafmap_project.js
    - Initializes Leaflet map
@@ -44,26 +43,119 @@ function initMap() {
 ======================= */
 
 /* Explanation:
-   loadTarpLayer() fetches the GeoJSON and adds it as a styled Leaflet layer.
-   After adding, it zooms the map to the layer’s extent.
+   loadTarpLayers() fetches multiple GeoJSON files and adds them to the map.
+   We add each GeoJSON to a featureGroup so we can zoom to the combined extent.
 */
-function loadTarpLayer() {
-  fetch("GGIS517/project/geoshape/TARP.geojson")
-    .then((response) => response.json())
-    .then((data) => {
-      const tarpLayer = L.geoJSON(data, {
-        style: {
-          color: "#0055ff",
-          weight: 3,
-          opacity: 0.9,
-        },
-      }).addTo(map);
+function loadTarpLayers() {
+  const urls = [
+    "GGIS517/project/geoshape/TARP_NEW.geojson",
+    "GGIS517/project/geoshape/WRPRES.geojson",
+  ];
 
-      // Zoom to the GeoJSON extent
-      map.fitBounds(tarpLayer.getBounds());
+  // Group to hold all GeoJSON layers for combined zoom
+  const group = L.featureGroup().addTo(map);
+
+  // Default line style (used when we don't need categorical styling)
+  const defaultLineStyle = {
+    color: "#0055ff",
+    weight: 3,
+    opacity: 0.9,
+  };
+
+  // Deterministic color from a string (so each "system" gets a stable color)
+  function colorFromString(str) {
+    if (!str) return "#666666";
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    const hue = Math.abs(hash) % 360;
+    return `hsl(${hue}, 70%, 45%)`;
+  }
+
+  // Style function for TARP_NEW features by the "system" field
+  function tarpStyleBySystem(feature) {
+    const system = feature?.properties?.system;
+    return {
+      color: colorFromString(system),
+      weight: 3,
+      opacity: 0.9,
+    };
+  }
+
+  Promise.all(
+    urls.map((url) =>
+      fetch(url)
+        .then((r) => r.json())
+        .then((data) => {
+          // If this is WRPRES, attach popup using "name" field
+          const isWRPRES = url.includes("WRPRES.geojson");
+          const isTARPNEW = url.includes("TARP_NEW.geojson");
+
+          const layer = L.geoJSON(data, {
+            style: isTARPNEW ? tarpStyleBySystem : defaultLineStyle,
+
+            // Only customize symbols for WRPRES points
+            pointToLayer: function (feature, latlng) {
+              if (!isWRPRES) {
+                return L.circleMarker(latlng, {
+                  radius: 6,
+                  weight: 1,
+                  opacity: 1,
+                  fillOpacity: 0.6,
+                });
+              }
+
+              const type = feature.properties?.type;
+
+              // Reservoir = blue
+              if (type === "Reservoir") {
+                return L.circleMarker(latlng, {
+                  radius: 8,
+                  fillColor: "#0077ff",
+                  color: "#003f88",
+                  weight: 1,
+                  opacity: 1,
+                  fillOpacity: 0.8,
+                });
+              }
+
+              // WRP = red
+              if (type === "WRP") {
+                return L.circleMarker(latlng, {
+                  radius: 8,
+                  fillColor: "#ff4d4d",
+                  color: "#990000",
+                  weight: 1,
+                  opacity: 1,
+                  fillOpacity: 0.8,
+                });
+              }
+
+              // Default fallback
+              return L.circleMarker(latlng);
+            },
+
+            onEachFeature: function (feature, layer) {
+              if (isWRPRES && feature.properties && feature.properties.name) {
+                layer.bindPopup(feature.properties.name);
+              }
+            },
+          });
+
+          layer.addTo(group);
+          return layer;
+        })
+    )
+  )
+    .then(() => {
+      // Zoom to combined bounds once all layers are loaded
+      if (group.getLayers().length) {
+        map.fitBounds(group.getBounds());
+      }
     })
     .catch((error) => {
-      console.error("Error loading TARP GeoJSON:", error);
+      console.error("Error loading GeoJSON layers:", error);
     });
 }
 
@@ -144,7 +236,7 @@ function openDefaultTab() {
 ======================= */
 onReady(function () {
   initMap();
-  loadTarpLayer();
+  loadTarpLayers();
 
   initCollapsibles();
   openDefaultTab();
