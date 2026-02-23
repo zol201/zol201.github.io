@@ -81,8 +81,8 @@ function renderLegend(systems = []) {
    We keep it in a function so the file is easier to read and maintain.
 */
 function initMap() {
-  // Chicago center
-  map = L.map("map").setView([41.8781, -87.6298], 11);
+  // Slightly shift center west (move map left visually)
+  map = L.map("map").setView([41.8781, -87.67], 11);
 
   // CARTO light basemap
   L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
