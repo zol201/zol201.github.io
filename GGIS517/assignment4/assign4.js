@@ -8,6 +8,11 @@
    - Click a city on the map OR a bar in Chart 1 to select a city
    - Use dropdown to filter by disaster type
    - Map + charts update together (coordinated multiple views)
+
+   Map Symbology:
+   - Blue (low) → Red (high)
+   - Gray = 0 (no event)
+   - Dynamic legend updates with the selected disaster type
    ========================================================= */
 
 /* =======================
@@ -22,7 +27,7 @@ function onReady(fn) {
 }
 
 /* =======================
-   1) Paths (edit if you rename files)
+   1) File paths
 ======================= */
 const GEOJSON_URL = "GGIS517/assignment4/Top10cities.json";
 const CSV_URL = "GGIS517/assignment4/disaster.csv";
@@ -37,19 +42,24 @@ const state = {
   disasters: [],            // unique disaster types
 };
 
+/* =======================
+   3) Leaflet globals
+======================= */
 let map = null;
 let geoLayer = null;
 const cityLayerByName = new Map(); // cityName -> Leaflet layer
 
+let legendControl = null;  // Leaflet legend control
+let legendDiv = null;      // DOM container for legend
+
 /* =======================
-   3) Utility
+   4) Utility
 ======================= */
 function normalizeCityName(x) {
-  // normalize common typos to keep joins consistent
   let s = String(x || "").trim();
   if (!s) return s;
 
-  // fix the common misspelling in your dataset
+  // Fix common misspelling in your dataset
   if (s.toLowerCase() === "jacksonvile") s = "Jacksonville";
 
   return s;
@@ -71,7 +81,7 @@ function getFilteredRows() {
 }
 
 /* =======================
-   4) Leaflet Map
+   5) Leaflet: Map + Legend
 ======================= */
 function initMap() {
   // US-centered view
@@ -84,30 +94,45 @@ function initMap() {
   }).addTo(map);
 }
 
-function baseCityStyle() {
+function initLegend() {
+  if (legendControl) return;
+
+  legendControl = L.control({ position: "bottomright" });
+  legendControl.onAdd = function () {
+    legendDiv = L.DomUtil.create("div", "legend");
+
+    // Prevent scroll/drag conflicts when interacting with legend
+    L.DomEvent.disableClickPropagation(legendDiv);
+    L.DomEvent.disableScrollPropagation(legendDiv);
+
+    legendDiv.innerHTML =
+      '<div class="legend"><div class="legend-title">Total (Loading…)</div><div class="small-muted">Blue = low, Red = high, Gray = 0. Updates with the selected disaster type.</div></div>';
+    return legendDiv;
+  };
+
+  legendControl.addTo(map);
+}
+
+function baseCityStyle(fillColor) {
   return {
     radius: 7,
     weight: 1,
     opacity: 1,
+    color: "#111827",
+    fillColor: fillColor || "#3b82f6",
     fillOpacity: 0.75,
   };
 }
 
-function selectedCityStyle() {
+function selectedCityStyle(fillColor) {
   return {
     radius: 10,
-    weight: 2,
+    weight: 3,
     opacity: 1,
+    color: "#111827",
+    fillColor: fillColor || "#3b82f6",
     fillOpacity: 0.95,
   };
-}
-
-function applyMapHighlight() {
-  cityLayerByName.forEach((layer, name) => {
-    if (!layer || !layer.setStyle) return;
-    const isSelected = !!state.selectedCity && name === state.selectedCity;
-    layer.setStyle(isSelected ? selectedCityStyle() : baseCityStyle());
-  });
 }
 
 function getCityNameFromFeatureProps(props) {
@@ -129,18 +154,18 @@ async function loadCitiesGeoJSON() {
     }
 
     geoLayer = L.geoJSON(geo, {
-      pointToLayer: (_feature, latlng) => L.circleMarker(latlng, baseCityStyle()),
+      pointToLayer: (_feature, latlng) => L.circleMarker(latlng, baseCityStyle("#3b82f6")),
       onEachFeature: (feature, layer) => {
         const name = getCityNameFromFeatureProps(feature?.properties);
-        if (name) {
-          cityLayerByName.set(name, layer);
-          layer.bindPopup(name);
+        if (!name) return;
 
-          layer.on("click", () => {
-            state.selectedCity = name;
-            renderAll();
-          });
-        }
+        cityLayerByName.set(name, layer);
+        layer.bindPopup(name);
+
+        layer.on("click", () => {
+          state.selectedCity = name;
+          renderAll();
+        });
       },
     }).addTo(map);
 
@@ -153,10 +178,100 @@ async function loadCitiesGeoJSON() {
 }
 
 /* =======================
-   5) Load CSV (D3)
-   Supports BOTH:
-   A) Long format: City,Disaster,Count
-   B) Wide format: first column = disaster type, city columns after
+   6) Data: compute totals
+======================= */
+function computeCityTotals(rowsFiltered) {
+  const totals = d3
+    .rollups(
+      rowsFiltered,
+      (v) => d3.sum(v, (d) => d.count),
+      (d) => d.city
+    )
+    .map(([city, total]) => [normalizeCityName(city), total]);
+
+  return new Map(totals);
+}
+
+/* =======================
+   7) Map updates: symbology + legend
+======================= */
+function applyMapStylesAndLegend(rowsFiltered) {
+  const totalsByCity = computeCityTotals(rowsFiltered);
+  const maxVal = d3.max(Array.from(totalsByCity.values())) || 0;
+
+  // Red–Blue diverging palette (low=blue, high=red). 0 handled as gray.
+  const colors = [
+    "#2166ac", // blue
+    "#67a9cf",
+    "#d1e5f0",
+    "#fddbc7",
+    "#ef8a62",
+    "#b2182b", // red
+  ];
+
+  // Quantize only for positive values (1..max). Zero is handled separately.
+  const colorScale = d3
+    .scaleQuantize()
+    .domain([1, Math.max(1, maxVal)])
+    .range(colors);
+
+  cityLayerByName.forEach((layer, name) => {
+    if (!layer || !layer.setStyle) return;
+
+    const v = totalsByCity.get(name) ?? 0;
+    const isSelected = !!state.selectedCity && name === state.selectedCity;
+
+    const fill = v === 0 ? "#bdbdbd" : colorScale(v);
+    layer.setStyle(isSelected ? selectedCityStyle(fill) : baseCityStyle(fill));
+
+    const disasterLabel = state.selectedDisaster === "All" ? "All disasters" : state.selectedDisaster;
+    layer.bindPopup(`${name}<br><b>${disasterLabel}</b>: ${v}`);
+  });
+
+  updateLegendColor(colorScale, maxVal);
+}
+
+function updateLegendColor(colorScale, maxVal) {
+  if (!legendDiv) return;
+
+  const title =
+    state.selectedDisaster === "All"
+      ? "Total (All disasters)"
+      : `Total (${state.selectedDisaster})`;
+
+  // Quantize breaks (only for 1..max). Add explicit 0 = gray item.
+  const thresholds = colorScale.thresholds();
+  const bounds = [1, ...thresholds, Math.max(1, maxVal || 1)];
+
+  let html = `<div class="legend"><div class="legend-title">${title}</div>`;
+
+  // 0 bin
+  html += `
+    <div class="legend-item">
+      <span class="legend-swatch" style="background:#bdbdbd"></span>
+      <span>0 (no event)</span>
+    </div>`;
+
+  // Positive bins
+  for (let i = 0; i < bounds.length - 1; i++) {
+    const a = Math.round(bounds[i]);
+    const b = Math.round(bounds[i + 1]);
+    const mid = (bounds[i] + bounds[i + 1]) / 2;
+    const swatch = colorScale(mid);
+
+    html += `
+      <div class="legend-item">
+        <span class="legend-swatch" style="background:${swatch}"></span>
+        <span>${a} – ${b}</span>
+      </div>`;
+  }
+
+  html += `</div>`;
+  legendDiv.innerHTML = html;
+}
+
+/* =======================
+   8) CSV loading (supports long OR wide)
 ======================= */
 function isLongFormat(columns) {
   const cols = (columns || []).map((c) => String(c).toLowerCase());
@@ -189,6 +304,7 @@ function wideToLong(rows, columns) {
       longRows.push({ city, disaster, count });
     }
   }
+
   return longRows;
 }
 
@@ -205,7 +321,6 @@ async function loadDisasterCSV() {
       longRows = wideToLong(rows, columns);
     }
 
-    // Clean + store
     state.rows = longRows.filter((d) => d.city && d.disaster);
     state.disasters = Array.from(new Set(state.rows.map((d) => d.disaster))).sort();
 
@@ -218,7 +333,7 @@ async function loadDisasterCSV() {
 }
 
 /* =======================
-   6) Dropdown control
+   9) UI controls
 ======================= */
 function initDisasterDropdown() {
   const sel = document.getElementById("disasterSelect");
@@ -240,9 +355,6 @@ function initDisasterDropdown() {
   });
 }
 
-/* =======================
-   7) Summary
-======================= */
 function updateSummary(rowsFiltered) {
   setText("statCity", state.selectedCity ? state.selectedCity : "All");
   setText("statDisaster", state.selectedDisaster);
@@ -252,7 +364,7 @@ function updateSummary(rowsFiltered) {
 }
 
 /* =======================
-   8) Chart 1 — Total by City (vertical bar)
+   10) Chart 1 — Total by City (clickable)
 ======================= */
 function renderCityTotalChart(rowsFiltered) {
   const totals = d3
@@ -318,7 +430,7 @@ function renderCityTotalChart(rowsFiltered) {
 }
 
 /* =======================
-   9) Chart 2 — Disaster Breakdown (selected city)
+   11) Chart 2 — Disaster Breakdown
 ======================= */
 function renderDisasterBreakdownChart(rowsFiltered) {
   const container = d3.select("#chartDisaster");
@@ -379,7 +491,7 @@ function renderDisasterBreakdownChart(rowsFiltered) {
 }
 
 /* =======================
-   10) Render all views
+   12) Render all views
 ======================= */
 function renderAll() {
   const rowsFiltered = getFilteredRows();
@@ -388,16 +500,16 @@ function renderAll() {
   renderCityTotalChart(rowsFiltered);
   renderDisasterBreakdownChart(rowsFiltered);
 
-  applyMapHighlight();
+  applyMapStylesAndLegend(rowsFiltered);
 }
 
 /* =======================
-   11) Boot
+   13) Boot
 ======================= */
 onReady(async function () {
   initMap();
+  initLegend();
 
-  // Load spatial + tabular data
   await loadCitiesGeoJSON();
   await loadDisasterCSV();
 

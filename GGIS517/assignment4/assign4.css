@@ -230,7 +230,19 @@ nav ul li a:hover{ text-decoration: underline; }
 .chart-wrap{ width: 100%; overflow: hidden; }
 .chart-wrap svg{ width: 100%; height: auto; }
 
+/* Improve D3 chart readability */
+.chart-wrap text{
+  font-size: 11px;
+  fill: #111827;
+}
+
+.chart-wrap .tick text{
+  fill: #374151;
+}
+
 /* ======================= Optional: Leaflet Legend ======================= */
+/* Your JS creates a Leaflet control div with class "legend", then inserts
+   an inner <div class="legend">…</div>. These rules prevent double padding. */
 .legend{
   background: rgba(255, 255, 255, 0.92);
   padding: 10px 12px;
@@ -241,21 +253,17 @@ nav ul li a:hover{ text-decoration: underline; }
   border: 1px solid var(--border);
 }
 
-.legend-title{ font-weight: 900; margin-bottom: 8px; }
-
-.legend-item{
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin: 6px 0;
+/* Remove duplicated card styling if legend HTML nests .legend inside .legend */
+.legend .legend{
+  background: transparent;
+  padding: 0;
+  border: 0;
+  box-shadow: none;
 }
 
-.legend-swatch{
-  width: 14px;
-  height: 14px;
-  border-radius: 4px;
-  border: 1px solid rgba(0, 0, 0, 0.28);
-  display: inline-block;
+/* Leaflet control spacing */
+.leaflet-control.legend{
+  margin: 0 12px 12px 0;
 }
 
 /* ======================= Responsive fallback (safe) ======================= */

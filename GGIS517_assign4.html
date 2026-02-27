@@ -64,28 +64,12 @@
           <h2>Filter</h2>
           <div class="control-row">
             <label for="disasterSelect">Disaster type</label>
-            <select id="disasterSelect"></select>
+            <select id="disasterSelect" aria-label="Select disaster type"></select>
           </div>
           <p class="small-muted">Tip: choose “All” to show totals for all disaster types.</p>
+          <p class="small-muted">Map legend updates dynamically based on the selected disaster type.</p>
         </div>
 
-
-
-        <!-- Chart 1 -->
-        <div class="panel-card">
-          <h2>Chart 1 — Total by City</h2>
-          <div id="chartCity" class="chart-wrap"></div>
-          <p class="small-muted">Click a bar to select a city.</p>
-        </div>
-
-        <!-- Chart 2 -->
-        <div class="panel-card">
-          <h2>Chart 2 — Disaster Breakdown (Selected City)</h2>
-          <div id="chartDisaster" class="chart-wrap"></div>
-          <p class="small-muted">Shows distribution across disaster types for the selected city.</p>
-        </div>
-
-                <!-- Summary -->
         <div class="panel-card">
           <h2>Summary</h2>
           <div class="stats-grid">
@@ -107,6 +91,21 @@
             </div>
           </div>
         </div>
+
+        <!-- Chart 1 -->
+        <div class="panel-card">
+          <h2>Chart 1 — Total by City</h2>
+          <div id="chartCity" class="chart-wrap"></div>
+          <p class="small-muted">Click a bar to select a city.</p>
+        </div>
+
+        <!-- Chart 2 -->
+        <div class="panel-card">
+          <h2>Chart 2 — Disaster Breakdown (Selected City)</h2>
+          <div id="chartDisaster" class="chart-wrap"></div>
+          <p class="small-muted">Shows distribution across disaster types for the selected city.</p>
+        </div>
+
       </aside>
     </section>
   </main>
