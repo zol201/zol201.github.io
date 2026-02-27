@@ -1,0 +1,351 @@
+City,Disaster,Count
+NYC,Winter Weather,16
+NYC,Winter Storm,9
+NYC,Heavy Snow,4
+NYC,Strong Wind,6
+NYC,Blizzard,1
+NYC,Excessive Heat,3
+NYC,Flash Flood,20
+NYC,Thunderstorm Wind,19
+NYC,High Wind,9
+NYC,Hail,4
+NYC,Heat,2
+NYC,Tropical Storm,1
+NYC,Lightning,2
+NYC,Sneakerwave,0
+NYC,Rip Current,0
+NYC,Wildfire,0
+NYC,Debris Flow,0
+NYC,Funnel Cloud,0
+NYC,Tornado,0
+NYC,Dust Storm,0
+NYC,Flood,0
+NYC,Cold/Wind Chill,0
+NYC,Heavy Rain,0
+NYC,Sleet,0
+NYC,Lake-Effect Snow,0
+NYC,Coastal Flood,0
+NYC,Extreme Cold/Wind Chill,0
+NYC,Ice Storm,0
+NYC,Lakeshore Flood,0
+NYC,Drought,0
+NYC,Frost/Freeze,0
+NYC,Dense Fog,0
+NYC,Dust Devil,0
+NYC,Astronomical Low Tide,0
+NYC,High Surf,0
+LA,Winter Weather,0
+LA,Winter Storm,35
+LA,Heavy Snow,1
+LA,Strong Wind,3
+LA,Blizzard,1
+LA,Excessive Heat,0
+LA,Flash Flood,102
+LA,Thunderstorm Wind,35
+LA,High Wind,249
+LA,Hail,9
+LA,Heat,0
+LA,Tropical Storm,0
+LA,Lightning,1
+LA,Sneakerwave,1
+LA,Rip Current,1
+LA,Wildfire,32
+LA,Debris Flow,21
+LA,Funnel Cloud,1
+LA,Tornado,6
+LA,Dust Storm,1
+LA,Flood,1
+LA,Cold/Wind Chill,0
+LA,Heavy Rain,0
+LA,Sleet,0
+LA,Lake-Effect Snow,0
+LA,Coastal Flood,0
+LA,Extreme Cold/Wind Chill,0
+LA,Ice Storm,0
+LA,Lakeshore Flood,0
+LA,Drought,0
+LA,Frost/Freeze,0
+LA,Dense Fog,0
+LA,Dust Devil,0
+LA,Astronomical Low Tide,0
+LA,High Surf,0
+Chicago,Winter Weather,21
+Chicago,Winter Storm,12
+Chicago,Heavy Snow,6
+Chicago,Strong Wind,1
+Chicago,Blizzard,0
+Chicago,Excessive Heat,4
+Chicago,Flash Flood,42
+Chicago,Thunderstorm Wind,155
+Chicago,High Wind,24
+Chicago,Hail,91
+Chicago,Heat,0
+Chicago,Tropical Storm,0
+Chicago,Lightning,7
+Chicago,Sneakerwave,0
+Chicago,Rip Current,6
+Chicago,Wildfire,0
+Chicago,Debris Flow,0
+Chicago,Funnel Cloud,0
+Chicago,Tornado,8
+Chicago,Dust Storm,0
+Chicago,Flood,68
+Chicago,Cold/Wind Chill,13
+Chicago,Heavy Rain,24
+Chicago,Sleet,1
+Chicago,Lake-Effect Snow,1
+Chicago,Coastal Flood,2
+Chicago,Extreme Cold/Wind Chill,1
+Chicago,Ice Storm,1
+Chicago,Lakeshore Flood,8
+Chicago,Drought,4
+Chicago,Frost/Freeze,0
+Chicago,Dense Fog,0
+Chicago,Dust Devil,0
+Chicago,Astronomical Low Tide,0
+Chicago,High Surf,0
+Houston,Winter Weather,1
+Houston,Winter Storm,1
+Houston,Heavy Snow,1
+Houston,Strong Wind,0
+Houston,Blizzard,0
+Houston,Excessive Heat,6
+Houston,Flash Flood,10
+Houston,Thunderstorm Wind,42
+Houston,High Wind,0
+Houston,Hail,30
+Houston,Heat,1
+Houston,Tropical Storm,1
+Houston,Lightning,2
+Houston,Sneakerwave,0
+Houston,Rip Current,0
+Houston,Wildfire,0
+Houston,Debris Flow,0
+Houston,Funnel Cloud,1
+Houston,Tornado,6
+Houston,Dust Storm,0
+Houston,Flood,0
+Houston,Cold/Wind Chill,0
+Houston,Heavy Rain,0
+Houston,Sleet,0
+Houston,Lake-Effect Snow,0
+Houston,Coastal Flood,0
+Houston,Extreme Cold/Wind Chill,1
+Houston,Ice Storm,2
+Houston,Lakeshore Flood,0
+Houston,Drought,5
+Houston,Frost/Freeze,0
+Houston,Dense Fog,0
+Houston,Dust Devil,0
+Houston,Astronomical Low Tide,0
+Houston,High Surf,0
+Phoenix,Winter Weather,0
+Phoenix,Winter Storm,1
+Phoenix,Heavy Snow,0
+Phoenix,Strong Wind,4
+Phoenix,Blizzard,0
+Phoenix,Excessive Heat,73
+Phoenix,Flash Flood,60
+Phoenix,Thunderstorm Wind,205
+Phoenix,High Wind,0
+Phoenix,Hail,15
+Phoenix,Heat,46
+Phoenix,Tropical Storm,0
+Phoenix,Lightning,2
+Phoenix,Sneakerwave,0
+Phoenix,Rip Current,0
+Phoenix,Wildfire,0
+Phoenix,Debris Flow,0
+Phoenix,Funnel Cloud,5
+Phoenix,Tornado,2
+Phoenix,Dust Storm,38
+Phoenix,Flood,10
+Phoenix,Cold/Wind Chill,0
+Phoenix,Heavy Rain,29
+Phoenix,Sleet,0
+Phoenix,Lake-Effect Snow,0
+Phoenix,Coastal Flood,0
+Phoenix,Extreme Cold/Wind Chill,0
+Phoenix,Ice Storm,0
+Phoenix,Lakeshore Flood,0
+Phoenix,Drought,0
+Phoenix,Frost/Freeze,3
+Phoenix,Dense Fog,5
+Phoenix,Dust Devil,2
+Phoenix,Astronomical Low Tide,0
+Phoenix,High Surf,0
+San Antonio,Winter Weather,11
+San Antonio,Winter Storm,5
+San Antonio,Heavy Snow,0
+San Antonio,Strong Wind,1
+San Antonio,Blizzard,0
+San Antonio,Excessive Heat,2
+San Antonio,Flash Flood,158
+San Antonio,Thunderstorm Wind,82
+San Antonio,High Wind,1
+San Antonio,Hail,193
+San Antonio,Heat,4
+San Antonio,Tropical Storm,1
+San Antonio,Lightning,3
+San Antonio,Sneakerwave,0
+San Antonio,Rip Current,0
+San Antonio,Wildfire,2
+San Antonio,Debris Flow,0
+San Antonio,Funnel Cloud,0
+San Antonio,Tornado,5
+San Antonio,Dust Storm,0
+San Antonio,Flood,4
+San Antonio,Cold/Wind Chill,0
+San Antonio,Heavy Rain,3
+San Antonio,Sleet,0
+San Antonio,Lake-Effect Snow,0
+San Antonio,Coastal Flood,0
+San Antonio,Extreme Cold/Wind Chill,2
+San Antonio,Ice Storm,0
+San Antonio,Lakeshore Flood,0
+San Antonio,Drought,23
+San Antonio,Frost/Freeze,0
+San Antonio,Dense Fog,0
+San Antonio,Dust Devil,0
+San Antonio,Astronomical Low Tide,0
+San Antonio,High Surf,0
+Philadelphia,Winter Weather,45
+Philadelphia,Winter Storm,12
+Philadelphia,Heavy Snow,2
+Philadelphia,Strong Wind,6
+Philadelphia,Blizzard,1
+Philadelphia,Excessive Heat,21
+Philadelphia,Flash Flood,88
+Philadelphia,Thunderstorm Wind,151
+Philadelphia,High Wind,13
+Philadelphia,Hail,16
+Philadelphia,Heat,4
+Philadelphia,Tropical Storm,1
+Philadelphia,Lightning,0
+Philadelphia,Sneakerwave,0
+Philadelphia,Rip Current,0
+Philadelphia,Wildfire,0
+Philadelphia,Debris Flow,0
+Philadelphia,Funnel Cloud,1
+Philadelphia,Tornado,3
+Philadelphia,Dust Storm,0
+Philadelphia,Flood,19
+Philadelphia,Cold/Wind Chill,9
+Philadelphia,Heavy Rain,3
+Philadelphia,Sleet,0
+Philadelphia,Lake-Effect Snow,0
+Philadelphia,Coastal Flood,15
+Philadelphia,Extreme Cold/Wind Chill,0
+Philadelphia,Ice Storm,0
+Philadelphia,Lakeshore Flood,0
+Philadelphia,Drought,0
+Philadelphia,Frost/Freeze,0
+Philadelphia,Dense Fog,16
+Philadelphia,Dust Devil,0
+Philadelphia,Astronomical Low Tide,6
+Philadelphia,High Surf,0
+San Diego,Winter Weather,4
+San Diego,Winter Storm,2
+San Diego,Heavy Snow,4
+San Diego,Strong Wind,20
+San Diego,Blizzard,0
+San Diego,Excessive Heat,24
+San Diego,Flash Flood,42
+San Diego,Thunderstorm Wind,27
+San Diego,High Wind,101
+San Diego,Hail,2
+San Diego,Heat,20
+San Diego,Tropical Storm,0
+San Diego,Lightning,13
+San Diego,Sneakerwave,0
+San Diego,Rip Current,1
+San Diego,Wildfire,8
+San Diego,Debris Flow,8
+San Diego,Funnel Cloud,4
+San Diego,Tornado,1
+San Diego,Dust Storm,3
+San Diego,Flood,25
+San Diego,Cold/Wind Chill,0
+San Diego,Heavy Rain,9
+San Diego,Sleet,0
+San Diego,Lake-Effect Snow,0
+San Diego,Coastal Flood,13
+San Diego,Extreme Cold/Wind Chill,0
+San Diego,Ice Storm,0
+San Diego,Lakeshore Flood,0
+San Diego,Drought,0
+San Diego,Frost/Freeze,0
+San Diego,Dense Fog,115
+San Diego,Dust Devil,0
+San Diego,Astronomical Low Tide,0
+San Diego,High Surf,54
+Dallas,Winter Weather,11
+Dallas,Winter Storm,5
+Dallas,Heavy Snow,16
+Dallas,Strong Wind,1
+Dallas,Blizzard,0
+Dallas,Excessive Heat,13
+Dallas,Flash Flood,80
+Dallas,Thunderstorm Wind,122
+Dallas,High Wind,2
+Dallas,Hail,150
+Dallas,Heat,29
+Dallas,Tropical Storm,0
+Dallas,Lightning,11
+Dallas,Sneakerwave,0
+Dallas,Rip Current,0
+Dallas,Wildfire,1
+Dallas,Debris Flow,0
+Dallas,Funnel Cloud,0
+Dallas,Tornado,15
+Dallas,Dust Storm,0
+Dallas,Flood,11
+Dallas,Cold/Wind Chill,2
+Dallas,Heavy Rain,1
+Dallas,Sleet,3
+Dallas,Lake-Effect Snow,0
+Dallas,Coastal Flood,0
+Dallas,Extreme Cold/Wind Chill,2
+Dallas,Ice Storm,1
+Dallas,Lakeshore Flood,0
+Dallas,Drought,24
+Dallas,Frost/Freeze,0
+Dallas,Dense Fog,0
+Dallas,Dust Devil,0
+Dallas,Astronomical Low Tide,0
+Dallas,High Surf,0
+Jacksonville,Winter Weather,2
+Jacksonville,Winter Storm,0
+Jacksonville,Heavy Snow,0
+Jacksonville,Strong Wind,1
+Jacksonville,Blizzard,0
+Jacksonville,Excessive Heat,0
+Jacksonville,Flash Flood,16
+Jacksonville,Thunderstorm Wind,199
+Jacksonville,High Wind,0
+Jacksonville,Hail,59
+Jacksonville,Heat,0
+Jacksonville,Tropical Storm,14
+Jacksonville,Lightning,46
+Jacksonville,Sneakerwave,0
+Jacksonville,Rip Current,11
+Jacksonville,Wildfire,2
+Jacksonville,Debris Flow,0
+Jacksonville,Funnel Cloud,4
+Jacksonville,Tornado,7
+Jacksonville,Dust Storm,0
+Jacksonville,Flood,31
+Jacksonville,Cold/Wind Chill,0
+Jacksonville,Heavy Rain,84
+Jacksonville,Sleet,0
+Jacksonville,Lake-Effect Snow,0
+Jacksonville,Coastal Flood,20
+Jacksonville,Extreme Cold/Wind Chill,0
+Jacksonville,Ice Storm,0
+Jacksonville,Lakeshore Flood,0
+Jacksonville,Drought,0
+Jacksonville,Frost/Freeze,0
+Jacksonville,Dense Fog,0
+Jacksonville,Dust Devil,0
+Jacksonville,Astronomical Low Tide,2
+Jacksonville,High Surf,2

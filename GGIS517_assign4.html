@@ -17,6 +17,7 @@
 
     <!-- 2) leafmap.css -->
     <link rel="stylesheet" href="GGIS517/assignment4/assign4.css">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
 
 </head>
 
@@ -44,78 +45,71 @@
     </ul>
     </nav>
 
-  <h2 style="text-align:center;">Project Overview</h2>
+  <main>
+    <section class="page-header">
+      <h1>Top 10 U.S. Cities — Natural Disaster Dashboard</h1>
+      <p>
+        This dashboard combines a Leaflet map and D3 charts. Click a city on the map (or a bar in Chart 1)
+        to update the views. Use the dropdown to filter by disaster type.
+      </p>
+    </section>
 
-  <!-- Map + Right Panel (same row) -->
-  <div id="map-layout">
-    <div id="map"></div>
-    <div id="description-panel">
-        <!-- Tab buttons -->
-        <button class="tablink" onclick="openPage('MapDisplay', this)"id="defaultOpen">Map Display</button>
-        <button class="tablink" onclick="openPage('TARP', this)">TARP</button>
+    <!-- Map + Right Panel (same row) -->
+    <section id="map-layout">
+      <div id="map"></div>
 
-        <!-- Tab content -->
-        <div id="MapDisplay" class="tabcontent">
-            <button type="button" class="collapsible">System1</button>
-            <div class="collapse-content">
-              <p>
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Porro animi consequatur eveniet quae vitae. Ea ut aspernatur odit praesentium quaerat, expedita molestias magnam dolor eos perspiciatis necessitatibus dolore suscipit similique?
-              </p>
-            </div>
-
-            <button type="button" class="collapsible">System2</button>
-            <div class="collapse-content">
-              <p>
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Amet, ipsa atque labore consectetur ratione ad quisquam repellat nostrum, at neque nulla, adipisci repudiandae laboriosam consequuntur dolores voluptatibus. Enim, aperiam ut.
-              </p>
-            </div>
-            <button type="button" class="collapsible">System3</button>
-            <div class="collapse-content">
-              <p>
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Amet, ipsa atque labore consectetur ratione ad quisquam repellat nostrum, at neque nulla, adipisci repudiandae laboriosam consequuntur dolores voluptatibus. Enim, aperiam ut.
-              </p>
-            </div>
-        </div>
-        <div id="TARP" class="tabcontent">
-            <button type="button" class="collapsible">What is TARP?</button>
-            <div class="collapse-content">
-              <p>
-                The Tunnel and Reservoir Plan (TARP), also known as the Chicago Deep Tunnel,
-                is a large-scale infrastructure system designed to reduce flooding
-                and improve water quality in the Chicago region.
-              </p>
-              <p>
-                <a href="https://mwrd.org/what-we-do/tunnel-and-reservoir-plan-tarp" target="_blank">
-                  Learn more on official website
-                </a>
-              </p>
-            </div>
-
-            <button type="button" class="collapsible">How TARP Works</button>
-            <div class="collapse-content">
-              <p>
-                TARP helps prevent flooding by capturing excess stormwater and sewage
-                during heavy rainfall. The water is temporarily stored underground
-                and treated later, instead of overflowing into streets and rivers.
-              </p>
-            </div>
-            <button type="button" class="collapsible">More Information</button>
-            <div class="collapse-content">
-              <p>
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Amet, ipsa atque labore consectetur ratione ad quisquam repellat nostrum, at neque nulla, adipisci repudiandae laboriosam consequuntur dolores voluptatibus. Enim, aperiam ut.
-              </p>
-            </div>
-            <button type="button" class="collapsible">More Information</button>
-            <div class="collapse-content">
-              <p>
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Amet, ipsa atque labore consectetur ratione ad quisquam repellat nostrum, at neque nulla, adipisci repudiandae laboriosam consequuntur dolores voluptatibus. Enim, aperiam ut.
-              </p>
-            </div>
+      <aside id="description-panel">
+        <!-- Controls -->
+        <div class="panel-card">
+          <h2>Filter</h2>
+          <div class="control-row">
+            <label for="disasterSelect">Disaster type</label>
+            <select id="disasterSelect"></select>
+          </div>
+          <p class="small-muted">Tip: choose “All” to show totals for all disaster types.</p>
         </div>
 
 
-    </div>
-  </div>
+
+        <!-- Chart 1 -->
+        <div class="panel-card">
+          <h2>Chart 1 — Total by City</h2>
+          <div id="chartCity" class="chart-wrap"></div>
+          <p class="small-muted">Click a bar to select a city.</p>
+        </div>
+
+        <!-- Chart 2 -->
+        <div class="panel-card">
+          <h2>Chart 2 — Disaster Breakdown (Selected City)</h2>
+          <div id="chartDisaster" class="chart-wrap"></div>
+          <p class="small-muted">Shows distribution across disaster types for the selected city.</p>
+        </div>
+
+                <!-- Summary -->
+        <div class="panel-card">
+          <h2>Summary</h2>
+          <div class="stats-grid">
+            <div class="stat">
+              <div class="label">Selected City</div>
+              <div class="value" id="statCity">All</div>
+            </div>
+            <div class="stat">
+              <div class="label">Selected Disaster</div>
+              <div class="value" id="statDisaster">All</div>
+            </div>
+            <div class="stat">
+              <div class="label">Total Count</div>
+              <div class="value" id="statTotal">0</div>
+            </div>
+            <div class="stat">
+              <div class="label">Max City Total</div>
+              <div class="value" id="statMaxCity">—</div>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </section>
+  </main>
 
   <!-- Leaflet JS -->
   <script
