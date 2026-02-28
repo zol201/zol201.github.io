@@ -250,6 +250,21 @@ nav ul li a:hover{ text-decoration: underline; }
 .chart-wrap{ width: 100%; overflow: hidden; }
 .chart-wrap svg{ width: 100%; height: auto; }
 
+/* Give chart areas a consistent minimum height so empty/default states don't look broken */
+#chartCity,
+#chartDisaster{
+  min-height: 120px;
+}
+
+/* Pie chart (Chart 2) tweaks */
+#chartDisaster svg text{
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+}
+
+#chartDisaster .small-muted{
+  margin-top: 0;
+}
+
 /* Improve D3 chart readability */
 .chart-wrap text{
   font-size: 11px;

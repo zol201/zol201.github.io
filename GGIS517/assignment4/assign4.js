@@ -664,64 +664,134 @@ function renderCityTotalChart(rowsFiltered) {
 /* =======================
    11) Chart 2 — Disaster Breakdown
 ======================= */
-function renderDisasterBreakdownChart(rowsFiltered) {
+function renderDisasterBreakdownChart(_rowsFiltered) {
   const container = d3.select("#chartDisaster");
   container.selectAll("*").remove();
 
-  const rows = state.selectedCity
-    ? rowsFiltered.filter((d) => d.city === state.selectedCity)
-    : rowsFiltered;
+  // If no city selected, prompt user
+  if (!state.selectedCity) {
+    container
+      .append("div")
+      .attr("class", "small-muted")
+      .style("padding", "10px 0")
+      .text("Select a city to see composition.");
+    return;
+  }
+
+  // Composition should be across ALL disaster types for the selected city
+  const cityRows = state.rows.filter((d) => d.city === state.selectedCity);
 
   const byDisaster = d3
     .rollups(
-      rows,
+      cityRows,
       (v) => d3.sum(v, (d) => d.count),
       (d) => d.disaster
     )
     .map(([disaster, total]) => ({ disaster, total }))
-    .sort((a, b) => d3.descending(a.total, b.total))
-    .slice(0, 12);
+    .filter((d) => d.total > 0)
+    .sort((a, b) => d3.descending(a.total, b.total));
+
+  const totalSum = d3.sum(byDisaster, (d) => d.total) || 0;
+
+  if (!totalSum || byDisaster.length === 0) {
+    container
+      .append("div")
+      .attr("class", "small-muted")
+      .style("padding", "10px 0")
+      .text("No data for this city.");
+    return;
+  }
+
+  const data = byDisaster.map((d) => ({
+    disaster: d.disaster,
+    total: d.total,
+    pct: d.total / totalSum,
+  }));
 
   const width = container.node()?.clientWidth || 360;
-  const height = 280;
-  const margin = { top: 10, right: 10, bottom: 30, left: 150 };
+  const height = 300;
+  const margin = 10;
+  const radius = Math.min(width, height) / 2 - margin;
 
   const svg = container.append("svg").attr("width", width).attr("height", height);
 
-  const y = d3
-    .scaleBand()
-    .domain(byDisaster.map((d) => d.disaster))
-    .range([margin.top, height - margin.bottom])
-    .padding(0.2);
-
-  const x = d3
-    .scaleLinear()
-    .domain([0, d3.max(byDisaster, (d) => d.total) || 1])
-    .nice()
-    .range([margin.left, width - margin.right]);
-
-  svg
+  const g = svg
     .append("g")
-    .selectAll("rect")
-    .data(byDisaster)
-    .join("rect")
-    .attr("x", margin.left)
-    .attr("y", (d) => y(d.disaster))
-    .attr("width", (d) => x(d.total) - margin.left)
-    .attr("height", y.bandwidth())
-    .attr("opacity", 0.9);
+    .attr("transform", `translate(${width / 2},${height / 2})`);
 
-  svg
-    .append("g")
-    .attr("transform", `translate(0,${height - margin.bottom})`)
-    .call(d3.axisBottom(x).ticks(5));
+  // Pie layout
+  const pie = d3.pie().sort(null).value((d) => d.total);
+  const arcs = pie(data);
 
+  // Categorical palette
+  const color = d3
+    .scaleOrdinal()
+    .domain(data.map((d) => d.disaster))
+    .range(d3.schemeTableau10);
+
+  const arc = d3.arc().innerRadius(0).outerRadius(radius);
+
+  const arcLabel = d3
+    .arc()
+    .innerRadius(radius * 0.65)
+    .outerRadius(radius * 0.65);
+
+  // Draw slices
+  g
+    .selectAll("path")
+    .data(arcs)
+    .join("path")
+    .attr("d", arc)
+    .attr("fill", (d) => color(d.data.disaster))
+    .attr("stroke", "white")
+    .attr("stroke-width", 1);
+
+  // Label only meaningful slices (>= 6%)
+  g
+    .selectAll("text")
+    .data(arcs)
+    .join("text")
+    .attr("transform", (d) => `translate(${arcLabel.centroid(d)})`)
+    .attr("text-anchor", "middle")
+    .style("font-size", "11px")
+    .style("font-weight", 800)
+    .text((d) => (d.data.pct >= 0.06 ? `${Math.round(d.data.pct * 100)}%` : ""));
+
+  // Title
   svg
+    .append("text")
+    .attr("x", 10)
+    .attr("y", 18)
+    .style("font-size", "12px")
+    .style("font-weight", 900)
+    .text(`${state.selectedCity} — Disaster composition (%)`);
+
+  // Legend (top 8)
+  const legendData = data.slice(0, 8);
+  const legend = svg
     .append("g")
-    .attr("transform", `translate(${margin.left},0)`)
-    .call(d3.axisLeft(y));
+    .attr("transform", `translate(10, ${height - 10 - legendData.length * 16})`);
+
+  const row = legend
+    .selectAll("g")
+    .data(legendData)
+    .join("g")
+    .attr("transform", (_d, i) => `translate(0, ${i * 16})`);
+
+  row
+    .append("rect")
+    .attr("width", 10)
+    .attr("height", 10)
+    .attr("y", -9)
+    .attr("fill", (d) => color(d.disaster));
+
+  row
+    .append("text")
+    .attr("x", 14)
+    .attr("y", 0)
+    .style("font-size", "11px")
+    .text((d) => `${d.disaster} (${Math.round(d.pct * 100)}%)`);
 }
-
 /* =======================
    12) Render all views
 ======================= */
