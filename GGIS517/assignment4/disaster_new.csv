@@ -1,74 +1,74 @@
 City,Disaster,Count
-NYC,Winter Weather,16
-NYC,Winter Storm,9
-NYC,Heavy Snow,4
-NYC,Strong Wind,6
-NYC,Blizzard,1
-NYC,Excessive Heat,3
-NYC,Flash Flood,20
-NYC,Thunderstorm Wind,19
-NYC,High Wind,9
-NYC,Hail,4
-NYC,Heat,2
-NYC,Tropical Storm,1
-NYC,Lightning,2
-NYC,Sneakerwave,0
-NYC,Rip Current,0
-NYC,Wildfire,0
-NYC,Debris Flow,0
-NYC,Funnel Cloud,0
-NYC,Tornado,0
-NYC,Dust Storm,0
-NYC,Flood,0
-NYC,Cold/Wind Chill,0
-NYC,Heavy Rain,0
-NYC,Sleet,0
-NYC,Lake-Effect Snow,0
-NYC,Coastal Flood,0
-NYC,Extreme Cold/Wind Chill,0
-NYC,Ice Storm,0
-NYC,Lakeshore Flood,0
-NYC,Drought,0
-NYC,Frost/Freeze,0
-NYC,Dense Fog,0
-NYC,Dust Devil,0
-NYC,Astronomical Low Tide,0
-NYC,High Surf,0
-LA,Winter Weather,0
-LA,Winter Storm,35
-LA,Heavy Snow,1
-LA,Strong Wind,3
-LA,Blizzard,1
-LA,Excessive Heat,0
-LA,Flash Flood,102
-LA,Thunderstorm Wind,35
-LA,High Wind,249
-LA,Hail,9
-LA,Heat,0
-LA,Tropical Storm,0
-LA,Lightning,1
-LA,Sneakerwave,1
-LA,Rip Current,1
-LA,Wildfire,32
-LA,Debris Flow,21
-LA,Funnel Cloud,1
-LA,Tornado,6
-LA,Dust Storm,1
-LA,Flood,1
-LA,Cold/Wind Chill,0
-LA,Heavy Rain,0
-LA,Sleet,0
-LA,Lake-Effect Snow,0
-LA,Coastal Flood,0
-LA,Extreme Cold/Wind Chill,0
-LA,Ice Storm,0
-LA,Lakeshore Flood,0
-LA,Drought,0
-LA,Frost/Freeze,0
-LA,Dense Fog,0
-LA,Dust Devil,0
-LA,Astronomical Low Tide,0
-LA,High Surf,0
+New York,Winter Weather,16
+New York,Winter Storm,9
+New York,Heavy Snow,4
+New York,Strong Wind,6
+New York,Blizzard,1
+New York,Excessive Heat,3
+New York,Flash Flood,20
+New York,Thunderstorm Wind,19
+New York,High Wind,9
+New York,Hail,4
+New York,Heat,2
+New York,Tropical Storm,1
+New York,Lightning,2
+New York,Sneakerwave,0
+New York,Rip Current,0
+New York,Wildfire,0
+New York,Debris Flow,0
+New York,Funnel Cloud,0
+New York,Tornado,0
+New York,Dust Storm,0
+New York,Flood,0
+New York,Cold/Wind Chill,0
+New York,Heavy Rain,0
+New York,Sleet,0
+New York,Lake-Effect Snow,0
+New York,Coastal Flood,0
+New York,Extreme Cold/Wind Chill,0
+New York,Ice Storm,0
+New York,Lakeshore Flood,0
+New York,Drought,0
+New York,Frost/Freeze,0
+New York,Dense Fog,0
+New York,Dust Devil,0
+New York,Astronomical Low Tide,0
+New York,High Surf,0
+Los Angeles,Winter Weather,0
+Los Angeles,Winter Storm,35
+Los Angeles,Heavy Snow,1
+Los Angeles,Strong Wind,3
+Los Angeles,Blizzard,1
+Los Angeles,Excessive Heat,0
+Los Angeles,Flash Flood,102
+Los Angeles,Thunderstorm Wind,35
+Los Angeles,High Wind,249
+Los Angeles,Hail,9
+Los Angeles,Heat,0
+Los Angeles,Tropical Storm,0
+Los Angeles,Lightning,1
+Los Angeles,Sneakerwave,1
+Los Angeles,Rip Current,1
+Los Angeles,Wildfire,32
+Los Angeles,Debris Flow,21
+Los Angeles,Funnel Cloud,1
+Los Angeles,Tornado,6
+Los Angeles,Dust Storm,1
+Los Angeles,Flood,1
+Los Angeles,Cold/Wind Chill,0
+Los Angeles,Heavy Rain,0
+Los Angeles,Sleet,0
+Los Angeles,Lake-Effect Snow,0
+Los Angeles,Coastal Flood,0
+Los Angeles,Extreme Cold/Wind Chill,0
+Los Angeles,Ice Storm,0
+Los Angeles,Lakeshore Flood,0
+Los Angeles,Drought,0
+Los Angeles,Frost/Freeze,0
+Los Angeles,Dense Fog,0
+Los Angeles,Dust Devil,0
+Los Angeles,Astronomical Low Tide,0
+Los Angeles,High Surf,0
 Chicago,Winter Weather,21
 Chicago,Winter Storm,12
 Chicago,Heavy Snow,6

@@ -66,8 +66,7 @@
             <label for="disasterSelect">Disaster type</label>
             <select id="disasterSelect" aria-label="Select disaster type"></select>
           </div>
-          <p class="small-muted">Tip: choose “All” to show totals for all disaster types.</p>
-          <p class="small-muted">Map legend updates dynamically based on the selected disaster type.</p>
+          <p class="small-muted">Legend and circle size update after you select a disaster type.</p>
         </div>
 
         <div class="panel-card">
@@ -75,19 +74,11 @@
           <div class="stats-grid">
             <div class="stat">
               <div class="label">Selected City</div>
-              <div class="value" id="statCity">All</div>
+              <select class="value" id="citySelect" aria-label="Select City"></select>
             </div>
             <div class="stat">
-              <div class="label">Selected Disaster</div>
-              <div class="value" id="statDisaster">All</div>
-            </div>
-            <div class="stat">
-              <div class="label">Total Count</div>
+              <div class="label">Count</div>
               <div class="value" id="statTotal">0</div>
-            </div>
-            <div class="stat">
-              <div class="label">Max City Total</div>
-              <div class="value" id="statMaxCity">—</div>
             </div>
           </div>
         </div>
@@ -103,7 +94,7 @@
         <div class="panel-card">
           <h2>Chart 2 — Disaster Breakdown (Selected City)</h2>
           <div id="chartDisaster" class="chart-wrap"></div>
-          <p class="small-muted">Shows distribution across disaster types for the selected city.</p>
+          <p class="small-muted">Shows totals by disaster type (for the selected city, if any).</p>
         </div>
 
       </aside>

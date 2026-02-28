@@ -204,7 +204,8 @@ nav ul li a:hover{ text-decoration: underline; }
 /* ======================= Summary Stats ======================= */
 .stats-grid{
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  /* Auto-fit works well for 2 items now, and stays responsive */
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   gap: 10px;
 }
 
@@ -221,9 +222,28 @@ nav ul li a:hover{ text-decoration: underline; }
   margin-bottom: 4px;
 }
 
+
 .stat .value{
   font-size: 16px;
   font-weight: 900;
+  word-break: break-word; /* long city names won't overflow */
+}
+
+/* Summary dropdown (Selected City) */
+.stats-grid .stat select.value{
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(17, 24, 39, 0.14);
+  background: #fff;
+  font-size: 14px;
+  font-weight: 900;
+  color: var(--text);
+  outline: none;
+}
+
+.stats-grid .stat select.value:focus{
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.18);
 }
 
 /* ======================= Chart Containers ======================= */
@@ -251,6 +271,7 @@ nav ul li a:hover{ text-decoration: underline; }
   font-size: 12px;
   line-height: 1.25;
   border: 1px solid var(--border);
+  min-width: 190px;
 }
 
 /* Remove duplicated card styling if legend HTML nests .legend inside .legend */
@@ -264,6 +285,86 @@ nav ul li a:hover{ text-decoration: underline; }
 /* Leaflet control spacing */
 .leaflet-control.legend{
   margin: 0 12px 12px 0;
+}
+
+/* Legend content */
+.legend-title{
+  font-weight: 900;
+  margin-bottom: 8px;
+}
+
+.legend-item{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 6px 0;
+}
+
+.legend-swatch{
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  border: 1px solid rgba(17, 24, 39, 0.25);
+  display: inline-block;
+}
+
+/* Optional: mini histogram inside legend (if enabled in JS) */
+.legend-hist{
+  margin: 8px 0 10px;
+}
+
+.legend-hist svg{
+  display: block;
+}
+
+/* Popup styling (Zoom button) */
+.popup-title{
+  font-weight: 900;
+  margin-bottom: 4px;
+}
+
+.popup-sub{
+  margin-bottom: 8px;
+  color: var(--text);
+}
+
+button.zoom-city{
+  display: inline-block;
+  padding: 6px 10px;
+  border: 1px solid rgba(17, 24, 39, 0.18);
+  border-radius: 10px;
+  background: #fff;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+button.zoom-city:hover{
+  background: rgba(17, 24, 39, 0.06);
+}
+
+/* ======================= City Labels (Leaflet tooltip) ======================= */
+/* Tooltip container when using: circle.bindTooltip(name, { permanent:true, className:"city-label" }) */
+.leaflet-tooltip.city-label{
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(17, 24, 39, 0.18);
+  border-radius: 10px;
+  box-shadow: 0 6px 18px rgba(17, 24, 39, 0.10);
+  padding: 4px 8px;
+  color: var(--text);
+  font-weight: 800;
+  font-size: 12px;
+  line-height: 1.2;
+  pointer-events: none; /* labels won't block clicking the circles */
+}
+
+/* Remove default Leaflet tooltip arrow for a cleaner label */
+.leaflet-tooltip.city-label:before{
+  display: none;
+}
+
+/* Make map features feel clickable */
+.leaflet-interactive{
+  cursor: pointer;
 }
 
 /* ======================= Responsive fallback (safe) ======================= */
