@@ -209,6 +209,11 @@ nav ul li a:hover{ text-decoration: underline; }
   gap: 10px;
 }
 
+/* Make first stat (City select) span two columns */
+.stats-grid .stat:first-child{
+  grid-column: span 2;
+}
+
 .stat{
   border: 1px solid rgba(17, 24, 39, 0.10);
   border-radius: 10px;
@@ -393,4 +398,75 @@ button.zoom-city:hover{
 @media (max-width: 768px){
   nav ul{ flex-direction: column; }
   nav ul li{ margin: 10px 0; }
+}
+
+/* =======================
+   Leaflet: North Arrow
+======================= */
+.north-arrow{
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+
+.north-arrow-box{
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(17, 24, 39, 0.12);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.north-arrow-n{
+  font-weight: 900;
+  font-size: 14px;
+  line-height: 14px;
+  color: #111827;
+  margin-top: 2px;
+}
+
+.north-arrow-tri{
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-bottom: 14px solid #111827;
+  margin-top: 4px;
+}
+
+/* Avoid collision with Leaflet zoom buttons */
+.leaflet-top.leaflet-left .north-arrow{
+  margin-top: 54px;
+}
+
+/* =======================
+   Summary: Zoom button + population
+======================= */
+#zoomCityBtn{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 36px;
+  padding: 0 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(17, 24, 39, 0.14);
+  background: rgba(255, 255, 255, 0.92);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+#zoomCityBtn:disabled{
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.stat-sub{
+  margin-top: 6px;
+  font-size: 12px;
+  color: rgba(17, 24, 39, 0.65);
 }

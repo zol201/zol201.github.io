@@ -13,7 +13,7 @@
    Map Symbology (when a disaster is selected)
    - Blue (low) → Red (high)
    - Gray = 0 (no event)
-   - Legend updates with selected disaster
+   - Legend updates with selected disaster type
    ========================================================= */
 
 /* =======================
@@ -33,15 +33,18 @@ function onReady(fn) {
 const GEOJSON_URL = "GGIS517/assignment4/Top10cities.json";
 const CSV_URL = "GGIS517/assignment4/disaster.csv";
 
+// Zoom behavior: when zoomed in enough, hide point markers and color city boundaries instead
+const ZOOM_POLYGON_MODE = 7; // >= this zoom: polygons use data color, points + labels hidden
+
 /* =======================
    2) Global state
 ======================= */
 const state = {
-  selectedCity: null, // string | null
+  selectedCity: null,   // string | null
   selectedDisaster: "", // string ("" means no selection / default view)
-  rows: [], // long rows: {city, disaster, count}
-  disasters: [], // unique disaster types
-  cities: [], // unique city names for the City dropdown
+  rows: [],             // long rows: {city, disaster, count}
+  disasters: [],        // unique disaster types
+  cities: [],           // unique city names for the City dropdown
 };
 
 /* =======================
@@ -52,8 +55,8 @@ let geoLayer = null;
 
 // City boundary polygons (outline) + centroid circles (data-driven)
 const cityPolygonByName = new Map(); // cityName -> Leaflet polygon layer
-const cityCircleByName = new Map(); // cityName -> Leaflet circleMarker layer
-const cityMetaByName = new Map(); // cityName -> { population?: number }
+const cityCircleByName = new Map();  // cityName -> Leaflet circleMarker layer
+const cityMetaByName = new Map();    // cityName -> { population?: number }
 
 // Legend control
 let legendControl = null;
@@ -82,7 +85,6 @@ function setText(id, value) {
   if (el) el.textContent = value;
 }
 
-
 function getCityNameFromFeatureProps(props) {
   const p = props || {};
   const raw =
@@ -93,11 +95,14 @@ function getCityNameFromFeatureProps(props) {
     p.City ||
     p.city_name ||
     p.CityName;
+
   return normalizeCityName(raw);
 }
 
 function getPopulationFromFeatureProps(props) {
   const p = props || {};
+
+  // Explicitly support population_M (stored in millions)
   const raw =
     p.population ||
     p.Population ||
@@ -106,10 +111,23 @@ function getPopulationFromFeatureProps(props) {
     p.POP ||
     p.pop_2020 ||
     p.POP2020 ||
-    p.pop2020;
+    p.pop2020 ||
+    p.population_M ||   // <-- your actual field
+    p.population_m ||
+    p.Population_M;
 
-  const n = Number(String(raw ?? "").replace(/,/g, ""));
-  return Number.isFinite(n) && n > 0 ? n : null;
+  if (raw === undefined || raw === null || raw === "") return null;
+
+  const s = String(raw).trim().replace(/,/g, "");
+  let n = Number(s);
+  if (!Number.isFinite(n)) return null;
+
+  // population_M is stored in millions → convert to actual population
+  if ("population_M" in p || "population_m" in p || "Population_M" in p) {
+    n = Math.round(n * 1_000_000);
+  }
+
+  return n > 0 ? n : null;
 }
 
 function formatNumber(n) {
@@ -122,12 +140,28 @@ function formatNumber(n) {
 
 function zoomToCityByName(city) {
   if (!map || !city) return;
+
   const poly = cityPolygonByName.get(city);
   if (poly && typeof poly.getBounds === "function") {
     map.fitBounds(poly.getBounds(), { padding: [20, 20] });
   } else if (poly && typeof poly.getLatLng === "function") {
     map.setView(poly.getLatLng(), Math.max(map.getZoom(), 9));
   }
+}
+
+// Toggle permanent tooltips (city labels)
+function setCityLabelsVisible(visible) {
+  cityCircleByName.forEach((circle) => {
+    if (!circle) return;
+    try {
+      if (visible) {
+        // Restore tooltip if it exists
+        if (circle.getTooltip && circle.getTooltip()) circle.openTooltip();
+      } else {
+        if (circle.closeTooltip) circle.closeTooltip();
+      }
+    } catch (_e) {}
+  });
 }
 
 /* =======================
@@ -144,7 +178,9 @@ function buildCityList() {
   const fromGeo = Array.from(cityPolygonByName.keys());
   const fromCSV = Array.from(new Set(state.rows.map((d) => d.city)));
 
-  const cities = Array.from(new Set([...fromGeo, ...fromCSV].map(normalizeCityName)))
+  const cities = Array.from(
+    new Set([...fromGeo, ...fromCSV].map(normalizeCityName))
+  )
     .filter(Boolean)
     .sort((a, b) => a.localeCompare(b));
 
@@ -188,6 +224,11 @@ function initMap() {
     })
     .addTo(map);
 
+  // Re-apply styles on zoom so polygon/point mode switches immediately
+  map.on("zoomend", () => {
+    applyMapStylesAndLegend(getFilteredRows());
+  });
+
   // Popup action: zoom to the selected city's boundary when clicking the button inside the popup
   map.on("popupopen", (e) => {
     const el = e.popup.getElement();
@@ -203,7 +244,6 @@ function initMap() {
         if (!city) return;
 
         zoomToCityByName(city);
-
         map.closePopup();
       },
       { once: true }
@@ -223,7 +263,11 @@ function initLegend() {
     L.DomEvent.disableScrollPropagation(legendDiv);
 
     legendDiv.innerHTML =
-      '<div class="legend"><div class="legend-title">Total (Loading…)</div><div class="small-muted">Blue = low, Red = high, Gray = 0. Updates with the selected disaster type.</div></div>';
+      '<div class="legend">' +
+      '<div class="legend-title">Total (Loading…)</div>' +
+      '<div class="small-muted">Blue = low, Red = high, Gray = 0. Updates with the selected disaster type.</div>' +
+      "</div>";
+
     return legendDiv;
   };
 
@@ -384,14 +428,10 @@ async function loadDisasterCSV() {
   try {
     const rows = await d3.csv(CSV_URL);
     const columns = rows.columns || [];
-    console.log("Loaded CSV:", CSV_URL, "rows:", rows.length, "columns:", columns);
 
-    let longRows = [];
-    if (isLongFormat(columns)) {
-      longRows = rows.map(parseLongRow);
-    } else {
-      longRows = wideToLong(rows, columns);
-    }
+    const longRows = isLongFormat(columns)
+      ? rows.map(parseLongRow)
+      : wideToLong(rows, columns);
 
     state.rows = longRows.filter((d) => d.city && d.disaster);
     state.disasters = Array.from(new Set(state.rows.map((d) => d.disaster))).sort();
@@ -423,22 +463,39 @@ function applyMapStylesAndLegend(rowsFiltered) {
   const totalsByCity = computeCityTotals(rowsFiltered);
   const maxVal = d3.max(Array.from(totalsByCity.values())) || 0;
 
+  const zoomedIn = map && map.getZoom && map.getZoom() >= ZOOM_POLYGON_MODE;
+
   // -----------------------
   // Default view (no disaster selected)
   // -----------------------
   if (!state.selectedDisaster) {
+    // Ensure labels are visible in default view
+    setCityLabelsVisible(true);
+
     cityCircleByName.forEach((layer, name) => {
       if (!layer || !layer.setStyle) return;
 
       const isSelected = !!state.selectedCity && name === state.selectedCity;
 
-      layer.setStyle(isSelected ? selectedCityStyle("#3b82f6") : baseCityStyle("#3b82f6"));
-      if (typeof layer.setRadius === "function") layer.setRadius(isSelected ? 16 : 12);
+      layer.setStyle(
+        isSelected ? selectedCityStyle("#3b82f6") : baseCityStyle("#3b82f6")
+      );
+
+      if (typeof layer.setRadius === "function") {
+        layer.setRadius(isSelected ? 16 : 12);
+      }
+
+      // Make sure points are visible in default view
+      layer.setStyle({ opacity: 1, fillOpacity: isSelected ? 0.95 : 0.75 });
 
       layer.bindPopup(`<div class="popup-title">${name}</div>`);
-      if (typeof layer.bringToFront === "function") layer.bringToFront();
+
+      if (typeof layer.bringToFront === "function") {
+        layer.bringToFront();
+      }
     });
 
+    // Default polygon outline (gray)
     cityPolygonByName.forEach((poly, name) => {
       if (!poly || !poly.setStyle) return;
 
@@ -453,7 +510,10 @@ function applyMapStylesAndLegend(rowsFiltered) {
 
     if (legendDiv) {
       legendDiv.innerHTML =
-        '<div class="legend"><div class="legend-title">Select a disaster</div><div class="small-muted">Choose a disaster type to color circles (blue→red, gray=0) and scale size by count.</div></div>';
+        '<div class="legend">' +
+        '<div class="legend-title">Select a disaster</div>' +
+        '<div class="small-muted">Choose a disaster type to color circles (blue→red, gray=0) and scale size by count.</div>' +
+        "</div>";
     }
 
     return;
@@ -462,14 +522,7 @@ function applyMapStylesAndLegend(rowsFiltered) {
   // -----------------------
   // Disaster-selected view
   // -----------------------
-  const colors = [
-    "#2166ac",
-    "#67a9cf",
-    "#d1e5f0",
-    "#fddbc7",
-    "#ef8a62",
-    "#b2182b",
-  ];
+  const colors = ["#2166ac", "#67a9cf", "#d1e5f0", "#fddbc7", "#ef8a62", "#b2182b"];
 
   const colorScale = d3
     .scaleQuantize()
@@ -482,6 +535,7 @@ function applyMapStylesAndLegend(rowsFiltered) {
     .range([6, 14])
     .clamp(true);
 
+  // Points + popups (hidden when zoomed in)
   cityCircleByName.forEach((layer, name) => {
     if (!layer || !layer.setStyle) return;
 
@@ -492,27 +546,61 @@ function applyMapStylesAndLegend(rowsFiltered) {
     layer.setStyle(isSelected ? selectedCityStyle(fill) : baseCityStyle(fill));
 
     const r = v === 0 ? 6 : rScale(v);
-    if (typeof layer.setRadius === "function") layer.setRadius(isSelected ? r + 4 : r);
-    if (typeof layer.bringToFront === "function") layer.bringToFront();
 
-    const disasterLabel = state.selectedDisaster === "All" ? "All disasters" : state.selectedDisaster;
+    if (zoomedIn) {
+      // Hide point markers and labels at high zoom (polygon mode)
+      layer.setStyle({ opacity: 0, fillOpacity: 0 });
+      if (typeof layer.setRadius === "function") layer.setRadius(1);
+    } else {
+      // Normal point mode
+      layer.setStyle({ opacity: 1, fillOpacity: isSelected ? 0.95 : 0.75 });
+      if (typeof layer.setRadius === "function") {
+        layer.setRadius(isSelected ? r + 4 : r);
+      }
+    }
+
+    if (typeof layer.bringToFront === "function") {
+      layer.bringToFront();
+    }
+
+    // Keep popup content the same
     layer.bindPopup(
       `<div class="popup-title">${name}</div>` +
-        `<div class="popup-sub"><b>${disasterLabel}</b>: ${v}</div>` +
+        `<div class="popup-sub"><b>${state.selectedDisaster}</b>: ${v}</div>` +
         `<button class="zoom-city" data-city="${name}" type="button">Zoom to city</button>`
     );
   });
 
+  // Labels: show only in point mode
+  setCityLabelsVisible(!zoomedIn);
+
+  // Polygons: gray outline in point mode; data-colored outline in polygon mode
   cityPolygonByName.forEach((poly, name) => {
     if (!poly || !poly.setStyle) return;
 
     const isSel = !!state.selectedCity && name === state.selectedCity;
-    poly.setStyle({
-      weight: isSel ? 3 : 1,
-      color: isSel ? "#111827" : "#9ca3af",
-      opacity: isSel ? 1 : 0.9,
-      fillOpacity: 0.0,
-    });
+
+    if (zoomedIn) {
+      const v = totalsByCity.get(name) ?? 0;
+      const fill = v === 0 ? "#bdbdbd" : colorScale(v);
+
+      // In polygon mode, make boundary outline use the SAME color as the circle marker.
+      poly.setStyle({
+        color: fill,
+        weight: isSel ? 4 : 2,
+        opacity: 1,
+        fillOpacity: 0.0,
+      });
+
+      if (typeof poly.bringToFront === "function") poly.bringToFront();
+    } else {
+      poly.setStyle({
+        weight: isSel ? 3 : 1,
+        color: isSel ? "#111827" : "#9ca3af",
+        opacity: isSel ? 1 : 0.9,
+        fillOpacity: 0.0,
+      });
+    }
   });
 
   updateLegendColor(colorScale, totalsByCity);
@@ -521,10 +609,7 @@ function applyMapStylesAndLegend(rowsFiltered) {
 function updateLegendColor(colorScale, totalsByCity) {
   if (!legendDiv) return;
 
-  const title =
-    state.selectedDisaster === "All"
-      ? "Total (All disasters)"
-      : `Total (${state.selectedDisaster})`;
+  const title = `Total (${state.selectedDisaster})`;
 
   const values = totalsByCity instanceof Map ? Array.from(totalsByCity.values()) : [];
   const unique = Array.from(
@@ -626,29 +711,68 @@ function updateSummary(rowsFiltered) {
 
   const zoomBtn = document.getElementById("zoomCityBtn");
 
-  // Default state: do not reveal any all-cities total
+  // Helper: set text only if the element exists (so JS won't break if HTML differs)
+  const safeSet = (id, val) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = val;
+  };
+
+  // Default state: do not reveal any all-cities totals
   if (!state.selectedDisaster) {
-    setText("statTotal", "—");
-    setText("statPop", "—");
+    safeSet("statTotal", "—");           // selected city count
+    safeSet("statPop", "—");             // selected city population
+    safeSet("statDisasterTotal", "—");   // total across all cities for selected disaster
+    safeSet("statMaxCity", "—");         // city with max count
+    safeSet("statMaxValue", "—");        // max value
     if (zoomBtn) zoomBtn.disabled = true;
     return;
   }
 
-  // If a city is selected, show that city's count; otherwise show total for selected disaster
-  const count = state.selectedCity
-    ? d3.sum(rowsFiltered.filter((d) => d.city === state.selectedCity), (d) => d.count)
-    : d3.sum(rowsFiltered, (d) => d.count);
+  // Total count across ALL cities for the selected disaster
+  const disasterTotal = d3.sum(rowsFiltered, (d) => d.count);
+  safeSet("statDisasterTotal", String(disasterTotal));
 
-  setText("statTotal", String(count));
+  // Max city (for the selected disaster)
+  const totalsByCity = d3
+    .rollups(
+      rowsFiltered,
+      (v) => d3.sum(v, (d) => d.count),
+      (d) => d.city
+    )
+    .map(([city, total]) => ({ city, total }));
 
-  // Population display (only meaningful when a city is selected)
+  const maxEntry =
+    totalsByCity.reduce(
+      (best, cur) => (cur.total > (best?.total ?? -Infinity) ? cur : best),
+      null
+    ) || null;
+
+  if (maxEntry) {
+    safeSet("statMaxCity", maxEntry.city);
+    safeSet("statMaxValue", String(maxEntry.total));
+  } else {
+    safeSet("statMaxCity", "—");
+    safeSet("statMaxValue", "—");
+  }
+
+  // Selected city count (only when a city is selected)
   if (state.selectedCity) {
+    const cityCount = d3.sum(
+      rowsFiltered.filter((d) => d.city === state.selectedCity),
+      (d) => d.count
+    );
+    safeSet("statTotal", String(cityCount));
+
+    // Population display (only meaningful when a city is selected)
     const meta = cityMetaByName.get(state.selectedCity);
     const pop = meta?.population;
-    setText("statPop", pop ? formatNumber(pop) : "N/A");
+    safeSet("statPop", pop ? formatNumber(pop) : "N/A");
+
     if (zoomBtn) zoomBtn.disabled = false;
   } else {
-    setText("statPop", "—");
+    // If no city selected, keep city-specific stats hidden
+    safeSet("statTotal", "—");
+    safeSet("statPop", "—");
     if (zoomBtn) zoomBtn.disabled = true;
   }
 }
@@ -665,6 +789,7 @@ function renderCityTotalChart(rowsFiltered) {
     )
     .map(([city, total]) => ({ city, total }))
     .sort((a, b) => d3.descending(a.total, b.total));
+
   const container = d3.select("#chartCity");
   container.selectAll("*").remove();
 
@@ -695,7 +820,9 @@ function renderCityTotalChart(rowsFiltered) {
     .attr("y", (d) => y(d.total))
     .attr("width", x.bandwidth())
     .attr("height", (d) => height - margin.bottom - y(d.total))
-    .attr("opacity", (d) => (state.selectedCity && d.city !== state.selectedCity ? 0.35 : 0.9))
+    .attr("opacity", (d) =>
+      state.selectedCity && d.city !== state.selectedCity ? 0.35 : 0.9
+    )
     .on("click", (_event, d) => {
       state.selectedCity = d.city;
       renderAll();
@@ -746,7 +873,6 @@ function renderDisasterBreakdownChart(_rowsFiltered) {
     .sort((a, b) => d3.descending(a.total, b.total));
 
   const totalSum = d3.sum(byDisaster, (d) => d.total) || 0;
-
   if (!totalSum || byDisaster.length === 0) {
     container
       .append("div")
@@ -778,9 +904,7 @@ function renderDisasterBreakdownChart(_rowsFiltered) {
   const svg = container.append("svg").attr("width", width).attr("height", height);
 
   // Center the pie in the upper area (exclude the legend area)
-  const g = svg
-    .append("g")
-    .attr("transform", `translate(${width / 2},${pieH / 2})`);
+  const g = svg.append("g").attr("transform", `translate(${width / 2},${pieH / 2})`);
 
   const pie = d3.pie().sort(null).value((d) => d.total);
   const arcs = pie(data);
@@ -796,8 +920,7 @@ function renderDisasterBreakdownChart(_rowsFiltered) {
     .innerRadius(radius * 0.65)
     .outerRadius(radius * 0.65);
 
-  g
-    .selectAll("path")
+  g.selectAll("path")
     .data(arcs)
     .join("path")
     .attr("d", arc)
@@ -806,8 +929,7 @@ function renderDisasterBreakdownChart(_rowsFiltered) {
     .attr("stroke-width", 1);
 
   // Label only meaningful slices (>= 6%)
-  g
-    .selectAll("text")
+  g.selectAll("text")
     .data(arcs)
     .join("text")
     .attr("transform", (d) => `translate(${arcLabel.centroid(d)})`)
@@ -828,9 +950,7 @@ function renderDisasterBreakdownChart(_rowsFiltered) {
   // Legend (top 8) — placed under the pie (inside the same SVG)
   const legendData = data.slice(0, 8);
   const legendTop = pieH + 8;
-  const legend = svg
-    .append("g")
-    .attr("transform", `translate(10, ${legendTop})`);
+  const legend = svg.append("g").attr("transform", `translate(10, ${legendTop})`);
 
   const row = legend
     .selectAll("g")
