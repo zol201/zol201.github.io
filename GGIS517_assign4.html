@@ -15,6 +15,7 @@
   1) Choose a disaster type from the dropdown to update the map symbols, legend, and charts.
   2) Select a city from the dropdown, click a bar in Chart 1, or click the city on the map to view city-specific counts.
   3) Use “Zoom to city” to zoom to the selected city boundary.
+  4) Chart 2 shows the breakdown of disaster types for the selected city (or all cities if no city is selected).
 
   Data sources:
   - City boundaries (GeoJSON): Top10cities.json (stored locally in GGIS517/assignment4/)
@@ -78,8 +79,15 @@
     <section class="page-header">
       <h1>Top 10 U.S. Cities — Natural Disaster Dashboard</h1>
       <p>
-        This dashboard combines a Leaflet map and D3 charts. Click a city on the map (or a bar in Chart 1)
-        to update the views. Use the dropdown to filter by disaster type.
+        This interactive dashboard explores natural disaster patterns across the top 10 most populated U.S. cities (2015–2025). 
+        <br><br>
+        <strong>How to use:</strong><br>
+        • Select a disaster type from the dropdown to update the map color, circle size, legend, and charts.<br>
+        • Click a city on the map or a bar in Chart 1 to update the summary statistics and disaster breakdown.<br>
+        • Use the "Zoom to city" button to view the selected city's boundary in detail.<br>
+        • At closer zoom levels, city boundaries are filled to match the symbol color for easier comparison.<br>
+        • Chart 2 shows the breakdown of disaster types for the selected city (or all cities if no city is selected).
+        
       </p>
     </section>
 
