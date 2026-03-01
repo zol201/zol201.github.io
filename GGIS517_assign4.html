@@ -1,14 +1,32 @@
 <!DOCTYPE html>
 <!--
-  GGIS 517 — Assignment 5 (Mapping & Charting for Multiple Views)
+  GGIS 517 — Assignment 5: Mapping and Charting for Multiple Views
 
-  Research question:
-  How do natural disaster event counts vary across major U.S. cities, and what is each city’s disaster composition?
+  Dashboard goal
+  How do natural disaster event (2015 ~ 2025) counts vary across major U.S. cities(top 10, based on the population 2024), 
+  and how does the disaster-type composition differ by city?
+
+  This dashboard supports comparing 
+  (1) the spatial pattern of disaster frequency, 
+  (2) total event counts across cities, and
+  (3) the percentage breakdown of disaster types within a selected city.
+
+  How to use:
+  1) Choose a disaster type from the dropdown to update the map symbols, legend, and charts.
+  2) Select a city from the dropdown, click a bar in Chart 1, or click the city on the map to view city-specific counts.
+  3) Use “Zoom to city” to zoom to the selected city boundary.
 
   Data sources:
-  - City boundaries (GeoJSON): Top10cities.json (stored in GGIS517/assignment4/)
-  - Disaster counts (CSV): disaster.csv (stored in GGIS517/assignment4/)
-  - Population: read from city GeoJSON properties when available
+  - City boundaries (GeoJSON): Top10cities.json (stored locally in GGIS517/assignment4/)
+    Includes an approximate population field (population_M) used in the Summary panel.
+    data source: https://www.census.gov/newsroom/press-releases/2025/vintage-2024-popest.html#:~:text=Table_content:%20header:%20%7C%20Rank%20%7C%20Area%20Name,Antonio%20city%20%7C%20Numeric%20Increase:%2023%2C945%20%7C
+  - Disaster event counts (CSV): disaster.csv (stored locally in GGIS517/assignment4/)
+    Contains event counts by city and disaster type.
+    data source: https://www.ncei.noaa.gov/stormevents/
+
+  Notes:
+  - Map symbology uses color to represent relative count (low→high) and size to represent magnitude.
+  - At higher zoom levels, city polygons may be colored to match the point symbology for easier reading.
 -->
 <html lang="en">
 
