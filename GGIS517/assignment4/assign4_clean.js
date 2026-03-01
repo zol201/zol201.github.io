@@ -504,7 +504,7 @@ function applyMapStylesAndLegend(rowsFiltered) {
         weight: isSel ? 3 : 1,
         color: isSel ? "#111827" : "#9ca3af",
         opacity: isSel ? 1 : 0.9,
-        fillOpacity: 0.0,
+        fillOpacity: 0.4,
       });
     });
 
@@ -524,10 +524,10 @@ function applyMapStylesAndLegend(rowsFiltered) {
   // -----------------------
   const colors = ["#2166ac", "#67a9cf", "#d1e5f0", "#fddbc7", "#ef8a62", "#b2182b"];
 
-  const colorScale = d3
-    .scaleQuantize()
-    .domain([1, Math.max(1, maxVal)])
-    .range(colors);
+const colorScale = d3
+  .scaleSequential()
+  .domain([1, Math.max(1, maxVal)])
+  .interpolator(d3.interpolateTurbo);
 
   const rScale = d3
     .scaleLinear()
@@ -589,7 +589,7 @@ function applyMapStylesAndLegend(rowsFiltered) {
         color: fill,
         weight: isSel ? 4 : 2,
         opacity: 1,
-        fillOpacity: 0.0,
+        fillOpacity: 0.4,
       });
 
       if (typeof poly.bringToFront === "function") poly.bringToFront();
@@ -598,7 +598,7 @@ function applyMapStylesAndLegend(rowsFiltered) {
         weight: isSel ? 3 : 1,
         color: isSel ? "#111827" : "#9ca3af",
         opacity: isSel ? 1 : 0.9,
-        fillOpacity: 0.0,
+        fillOpacity: 0.4,
       });
     }
   });
