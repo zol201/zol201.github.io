@@ -6,11 +6,10 @@
   align-items:stretch;
   height: 700px;            /* fixed visible height; change if you want */
   padding: 10px 16px 24px 16px;
-  box-sizing: border-box;
 }
 
 #map{
-  flex: 0 0 70%;
+  flex: 0 0 65%;
   height: 100%;
   min-height: 700px;
   border:2px solid rgba(0,0,0,0.25);
@@ -18,7 +17,7 @@
 }
 
 #description-panel{
-  flex: 0 0 30%;
+  flex: 0 0 35%;
   height: 100%;
   min-height: 700px;
   padding:16px;
@@ -26,7 +25,6 @@
   overflow-y:auto;
   box-shadow:-2px 0 8px rgba(0,0,0,0.12);
   border-radius:10px;
-  box-sizing:border-box;
   position:relative;
   z-index:1000;
 }
@@ -38,7 +36,9 @@
 /* ======================= Reset / Base ======================= */
 *{margin:0;padding:0;box-sizing:border-box;}
 :root{ --pair-img-h: 560px; }          /* Fixed equal height for paired images (desktop) */
-body{position:relative;}
+
+/* Global type baseline (removes repeated font-family/font-size declarations) */
+body{position:relative;font-family:Verdana;font-size:20px;}
 main{flex:1;}
 
 /* Global background (default image) */
@@ -60,23 +60,25 @@ header{
   color:#fff; text-align:center; padding:20px 0;
 }
 header img.header-logo{width:60px;height:auto;margin-right:15px;}
-header h1{font-family:Verdana;font-size:2.5rem;color:#fff;margin:0;}
+header h1{font-size:2.5rem;color:#fff;margin:0;}
 header p{font-size:1.2rem;color:#fff;margin:0;text-align:center;padding:0;}
 
 /* ======================= Typography ======================= */
 h1{color:#35315a;text-align:center;font-size:30px;margin:0 10px;}
-h2{font-family:Verdana;font-size:20px;font-weight:bold;font-style:italic;color:#04272f;text-align:left;margin:10px 15px;}
-h3{
-  font-family:Verdana;
+
+/* Headings share the same typography; margins differ */
+h2, h3{
   font-size:20px;
   font-weight:bold;
   font-style:italic;
   color:#04272f;
   text-align:left;
-  margin:10px 0;
-  padding:0;
 }
-p{font-family: Verdana;font-size:20px;text-align:left;}
+h2{margin:10px 15px;}
+h3{margin:10px 0;padding:0;}
+
+/* Body text baseline (inherits from body) */
+p{text-align:left;}
 
 /* ======================= Nav ======================= */
 nav{margin:0;padding:0;}
@@ -85,7 +87,7 @@ nav ul{
 }
 nav ul li{margin:0 50px;}
 nav ul li a{
-  color:#fff;text-decoration:none;font-weight:bold;font-size:20px;font-family:Verdana;
+  color:#fff;text-decoration:none;font-weight:bold;font-size:20px;
 }
 nav ul li a:hover{text-decoration:underline;}
 
@@ -106,8 +108,9 @@ nav ul li a:hover{text-decoration:underline;}
   color:rgb(24, 79, 79);
   text-decoration:none;
   font-size:14px;       /* smaller text */
-  font-family:Verdana;
 }
+
+/* Removed font-family:Verdana; as per instructions */
 
 .sub-nav ul li a:hover{
   text-decoration:underline;
@@ -210,7 +213,7 @@ footer{
   background:#fff;box-shadow:0 -2px 5px rgba(0,0,0,.2);
 }
 footer p{
-  background:#afcdcbb4;font-family:Verdana;font-size:15px;text-align:center;
+  background:#afcdcbb4;font-size:15px;text-align:center;
   margin:0 25px;padding-left:10px;font-style:italic;
 }
 
@@ -290,6 +293,121 @@ footer p{
   padding:14px 18px;
   margin-bottom:12px;
   line-height:1.6;
+}
+
+/* ======================= Vertical Timeline (TARP / Timeline collapsible) ======================= */
+.vtl-wrap{ margin: 10px 0 4px; }
+.vtl-hint{ margin: 0 0 12px; color: #666; font-size: 13px; }
+
+.vtl{
+  position: relative;
+  padding-left: 22px;
+  margin: 0;
+}
+
+/* vertical line */
+.vtl::before{
+  content: "";
+  position: absolute;
+  left: 10px;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(0,120,255,0.9), rgba(99,102,241,0.9));
+  opacity: 0.9;
+}
+
+.vtl-item{
+  position: relative;
+  list-style: none;
+  margin: 0 0 14px;
+  padding-left: 10px;
+}
+
+/* dot */
+.vtl-item::before{
+  content: "";
+  position: absolute;
+  left: -20px;
+  top: 16px;
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  background: #0077ff;
+  border: 2px solid rgba(255,255,255,0.95);
+  box-shadow: 0 0 0 5px rgba(0,119,255,0.16);
+}
+
+/* card */
+.vtl-card{
+  background: rgba(255,255,255,0.65);
+  border: 1px solid rgba(0,0,0,0.08);
+  border-radius: 14px;
+  padding: 14px 14px 12px;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.vtl-card:hover{
+  transform: translateY(-2px);
+  box-shadow: 0 12px 26px rgba(0,0,0,0.12);
+}
+
+.vtl-top{
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 6px;
+}
+
+.vtl-year{
+  font-weight: 800;
+  font-size: 12px;
+  letter-spacing: 0.8px;
+  color: #0f172a;
+}
+
+.vtl-tag{
+  font-size: 11px;
+  color: rgba(15,23,42,0.65);
+  border: 1px solid rgba(15,23,42,0.14);
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.35);
+}
+
+.vtl-title{
+  margin: 0;
+  font-size: 14px;
+  font-weight: 650;
+  color: #0f172a;
+}
+
+.vtl-desc{
+  margin: 6px 0 0;
+  font-size: 13px;
+  color: rgba(15,23,42,0.72);
+  line-height: 1.35;
+}
+
+/* highlight future milestone */
+.vtl-item.future::before{
+  background: #f59e0b;
+  box-shadow: 0 0 0 5px rgba(245,158,11,0.18);
+}
+.vtl-item.future .vtl-tag{
+  border-color: rgba(245,158,11,0.28);
+  color: rgba(161,98,7,0.95);
+  background: rgba(245,158,11,0.10);
+}
+
+/* tighter on small screens */
+@media (max-width: 520px){
+  .vtl{ padding-left: 18px; }
+  .vtl::before{ left: 8px; }
+  .vtl-item::before{ left: -18px; }
 }
 
 /* ======================= Tabs (Right Panel) ======================= */
