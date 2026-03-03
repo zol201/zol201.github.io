@@ -32,6 +32,101 @@ function escapeHtml(value) {
 }
 
 /* =======================
+   0.5) Mini Charts (no library)
+======================= */
+
+function ensureChartStyles() {
+  if (document.getElementById('tarp-mini-chart-styles')) return;
+
+  const style = document.createElement('style');
+  style.id = 'tarp-mini-chart-styles';
+  style.textContent = `
+    .mini-chart{ margin: 10px 0 6px; }
+    .mini-chart-title{ margin: 0 0 8px; font-weight: 700; font-size: 14px; color: #0f172a; }
+    .mini-chart-sub{ margin: 0 0 10px; font-size: 12px; color: rgba(15,23,42,0.72); }
+
+    .mini-bars{ display: grid; gap: 10px; }
+    .mini-row{ display: grid; grid-template-columns: 150px 1fr 70px; gap: 10px; align-items: center; }
+
+    .mini-label{ font-size: 12px; color: rgba(15,23,42,0.85); }
+    .mini-track{ height: 10px; background: rgba(0,0,0,0.08); border-radius: 999px; overflow: hidden; }
+    .mini-bar{ height: 100%; border-radius: 999px; }
+    .mini-value{ font-size: 12px; text-align: right; color: rgba(15,23,42,0.75); }
+
+    @media (max-width: 520px){
+      .mini-row{ grid-template-columns: 1fr; gap: 6px; }
+      .mini-value{ text-align: left; }
+    }
+  `;
+  document.head.appendChild(style);
+}
+
+/**
+ * Render a simple horizontal bar chart into a container.
+ * - containerId: the target element id in HTML
+ * - title: chart title
+ * - subtitle: optional
+ * - rows: [{ label, value, valueLabel, color }]
+ */
+function renderMiniBarChart(containerId, title, subtitle, rows) {
+  const el = document.getElementById(containerId);
+  if (!el) return; // Safe: do nothing if the container isn't in HTML yet
+
+  ensureChartStyles();
+
+  const maxVal = Math.max(...rows.map((r) => r.value));
+  const barsHtml = rows
+    .map((r) => {
+      const pct = maxVal ? Math.round((r.value / maxVal) * 100) : 0;
+      return `
+        <div class="mini-row">
+          <div class="mini-label">${escapeHtml(r.label)}</div>
+          <div class="mini-track">
+            <div class="mini-bar" style="width:${pct}%; background:${r.color};"></div>
+          </div>
+          <div class="mini-value">${escapeHtml(r.valueLabel ?? String(r.value))}</div>
+        </div>
+      `;
+    })
+    .join('');
+
+  el.innerHTML = `
+    <div class="mini-chart" role="img" aria-label="${escapeHtml(title)}">
+      <div class="mini-chart-title">${escapeHtml(title)}</div>
+      ${subtitle ? `<div class="mini-chart-sub">${escapeHtml(subtitle)}</div>` : ''}
+      <div class="mini-bars">${barsHtml}</div>
+    </div>
+  `;
+}
+
+function renderTarpCharts() {
+  // 1) Reservoir storage capacity (billion gallons)
+  renderMiniBarChart(
+    'chart-reservoir-capacity',
+    'Reservoir Storage Capacity',
+    'Approx. storage (billion gallons).',
+    [
+      { label: 'Majewski', value: 0.35, valueLabel: '0.35 BG', color: '#0077ff' },
+      { label: 'Thornton', value: 7.9, valueLabel: '7.9 BG', color: '#0077ff' },
+      { label: 'McCook Stage 1', value: 3.5, valueLabel: '3.5 BG', color: '#0077ff' },
+      { label: 'McCook Stage 2 (Est.)', value: 6.5, valueLabel: '6.5 BG', color: '#0077ff' },
+    ]
+  );
+
+  // 2) Tunnel system length (illustrative; replace with your exact numbers if needed)
+  renderMiniBarChart(
+    'chart-tunnel-length',
+    'Tunnel System Length',
+    'Illustrative lengths (miles). Replace with your source values.',
+    [
+      { label: 'Upper Des Plaines', value: 35, valueLabel: '35 mi', color: '#db2870' },
+      { label: 'Desplaines', value: 40, valueLabel: '40 mi', color: '#ffaa00' },
+      { label: 'Culmet', value: 45, valueLabel: '45 mi', color: '#00c251' },
+    ]
+  );
+}
+
+/* =======================
    1) App Config
 ======================= */
 
@@ -106,15 +201,14 @@ let legendDiv = null;
 function colorFromString(str) {
   if (!str) return '#666666';
 
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    hash = str.charCodeAt(i) + ((hash << 5) - hash);
-  }
+  const s = str.toLowerCase();
 
-  const hue = Math.abs(hash) % 360;
-  return `hsl(${hue}, 70%, 45%)`;
+  if (s.includes('upper')) return '#db2870';      // blue
+  if (s.includes('des')) return '#ffaa00';        // green
+  if (s.includes('calumet')) return '#00c251';    // purple
+
+  return '#6b7280'; // fallback gray
 }
-
 /* =======================
    4) Legend
 ======================= */
@@ -164,12 +258,18 @@ function renderLegend(systems = []) {
 
       return `
         <div class="legend-item">
-          <span class="legend-swatch" style="background:${colorFromString(s)};"></span>
+          <span class="legend-swatch" 
+                style="display:inline-block;
+                       width:26px;
+                       height:4px;
+                       background:${colorFromString(s)};
+                       border-radius:2px;
+                       margin-right:6px;"></span>
           ${escapeHtml(displayName)}
         </div>`;
     })
     .join('');
-
+    // Static categories for WRPRES points (not based on “system”)
   legendDiv.innerHTML = `
     <div class="legend-title">${escapeHtml(CONFIG.legend.title)}</div>
 
@@ -180,7 +280,7 @@ function renderLegend(systems = []) {
 
     <div class="legend-item">
       <span class="legend-swatch" style="background:#ff4d4d; border-radius:50%;"></span>
-      WRP
+      Water Reclamation Plant
     </div>
 
     <hr class="legend-sep">
@@ -381,6 +481,9 @@ onReady(function () {
 
   initCollapsibles();
   openDefaultTab();
+
+  // Optional mini charts (only render if containers exist)
+  renderTarpCharts();
 
   // Expose openPage globally if your HTML calls it via onclick="openPage(...)"
   window.openPage = openPage;

@@ -256,12 +256,22 @@ footer p{
   margin: 6px 0;
 }
 
+/* Default swatch = point (circle) */
 .legend-swatch{
-  width: 14px;
-  height: 14px;
-  border-radius: 4px;
-  border: 1px solid rgba(0, 0, 0, 0.35);
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 1px solid rgba(0,0,0,0.25);
   display: inline-block;
+  flex: 0 0 auto;
+}
+
+/* Line swatch for tunnel systems */
+.legend-swatch.legend-line{
+  width: 26px;
+  height: 4px;
+  border-radius: 2px;
+  border: none;
 }
 
 
@@ -436,4 +446,23 @@ footer p{
 #description-panel p{
   line-height: 1.45;
   margin: 10px 0;
+}
+
+
+/* ======================= Mini Charts (Right Panel) ======================= */
+.mini-chart{ margin: 10px 0 6px; }
+.mini-chart-title{ margin: 0 0 8px; font-weight: 700; font-size: 14px; color: #0f172a; }
+.mini-chart-sub{ margin: 0 0 10px; font-size: 12px; color: rgba(15,23,42,0.72); }
+
+.mini-bars{ display: grid; gap: 10px; }
+.mini-row{ display: grid; grid-template-columns: 150px 1fr 70px; gap: 10px; align-items: center; }
+
+.mini-label{ font-size: 12px; color: rgba(15,23,42,0.85); }
+.mini-track{ height: 10px; background: rgba(0,0,0,0.08); border-radius: 999px; overflow: hidden; }
+.mini-bar{ height: 100%; border-radius: 999px; }
+.mini-value{ font-size: 12px; text-align: right; color: rgba(15,23,42,0.75); }
+
+@media (max-width: 520px){
+  .mini-row{ grid-template-columns: 1fr; gap: 6px; }
+  .mini-value{ text-align: left; }
 }
