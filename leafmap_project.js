@@ -135,11 +135,12 @@ const CONFIG = {
     // Slightly shift center west (move map left visually)
     center: [41.8781, -87.5],
     zoom: 10,
-    basemapUrl: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
+    basemapUrl: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
     basemapAttribution:
       '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors ' +
       '&copy; <a href="https://carto.com/attributions">CARTO</a>',
   },
+  
 
   data: {
     tarpUrl: 'GGIS517/project/geoshape/TARP_NEW.geojson',
