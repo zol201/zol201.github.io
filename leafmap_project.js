@@ -4,14 +4,91 @@
    leafmap_project.js
    - Initializes Leaflet map
    - Loads TARP GeoJSON layers
-   - Controls UI: Tabs + Collapsible sections
+   - Controls UI: tabs + collapsible sections
+   - Renders simple charts and map legend
    ========================================================= */
 
 /* =======================
-   0) Utilities
+   0) App Config
 ======================= */
 
-// Run callback when DOM is ready (safe for both local + GitHub Pages)
+const CONFIG = {
+  map: {
+    center: [41.8781, -87.5],
+    zoom: 10,
+    basemapUrl: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
+    basemapAttribution:
+      '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors ' +
+      '&copy; <a href="https://carto.com/attributions">CARTO</a>',
+  },
+
+  data: {
+    tarpUrl: 'GGIS517/project/geoshape/TARP_NEW_4.geojson',
+    wrpresUrl: 'GGIS517/project/geoshape/WRPRES.geojson',
+  },
+
+  styles: {
+    defaultLine: {
+      color: '#4b5563',
+      weight: 4,
+      opacity: 0.9,
+    },
+
+    reservoir: {
+      radius: 8,
+      fillColor: '#c65622',
+      color: '#1F4E79',
+      weight: 1.6,
+      opacity: 1,
+      fillOpacity: 0.9,
+    },
+
+    wrp: {
+      radius: 11,
+      fillColor: '#d44444',
+      color: '#FFFFFF',
+      weight: 1.5,
+      opacity: 1,
+      fillOpacity: 0.95,
+    },
+
+    fallbackPoint: {
+      radius: 6,
+      color: '#555',
+      fillColor: '#888',
+      weight: 1,
+      opacity: 1,
+      fillOpacity: 0.6,
+    },
+  },
+
+  legend: {
+    position: 'topright',
+    title: 'TARP Infrastructure',
+  },
+};
+
+/* =======================
+   1) Global State
+======================= */
+
+let map = null;
+let legendControl = null;
+let legendDiv = null;
+let allTarpLayersGroup = null;
+const zoomTargets = {
+  all: null,
+  systems: {},
+  facilities: {
+    reservoir: null,
+    wrp: null,
+  },
+};
+
+/* =======================
+   2) Utilities
+======================= */
+
 function onReady(fn) {
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', fn);
@@ -20,7 +97,6 @@ function onReady(fn) {
   }
 }
 
-// Basic HTML escaping for dynamic strings injected into innerHTML
 function escapeHtml(value) {
   const s = String(value ?? '');
   return s
@@ -31,16 +107,129 @@ function escapeHtml(value) {
     .replaceAll("'", '&#39;');
 }
 
+/* =======================
+   3) System Helpers
+======================= */
 
-/**
- * Render a simple horizontal bar chart into a container.
- * - containerId: the target element id in HTML
- * - title: chart title
- * - subtitle: optional
- * - rows: [{ label, value, valueLabel, color }]
- */
+function colorFromString(str) {
+  if (!str) return '#6b7280';
+
+  const s = String(str).toLowerCase();
+
+  if (s.includes('calumet')) return '#7A4DA3';
+  if (s.includes('des plaines') && !s.includes('upper')) return '#2C7FB8';
+  if (s.includes('mainstream')) return '#4C9A5F';
+  if (s.includes('upper des plaines')) return '#C65622';
+
+  return '#6b7280';
+}
+
+function normalizeSystemName(name) {
+  const s = String(name ?? '').toLowerCase();
+
+  if (s.includes('calumet')) return 'System 1';
+  if (s.includes('des plaines') && !s.includes('upper')) return 'System 2';
+  if (s.includes('mainstream')) return 'System 3';
+  if (s.includes('upper des plaines')) return 'System 4';
+
+  return String(name ?? '');
+}
+
+function getSystemDisplayName(name) {
+  const normalized = normalizeSystemName(name);
+
+  if (normalized === 'System 1') return 'Calumet';
+  if (normalized === 'System 2') return 'Des Plaines';
+  if (normalized === 'System 3') return 'Mainstream';
+  if (normalized === 'System 4') return 'Upper Des Plaines';
+
+  return String(name ?? '');
+}
+
+function getSystemKey(name) {
+  const normalized = normalizeSystemName(name);
+
+  if (normalized === 'System 1') return 'system1';
+  if (normalized === 'System 2') return 'system2';
+  if (normalized === 'System 3') return 'system3';
+  if (normalized === 'System 4') return 'system4';
+
+  return null;
+}
+
+function ensureFeatureGroup(target) {
+  return target ?? L.featureGroup();
+}
+
+function registerZoomTarget(feature, layer, isWRPRES) {
+  if (!layer) return;
+
+  zoomTargets.all = ensureFeatureGroup(zoomTargets.all);
+  zoomTargets.all.addLayer(layer);
+
+  if (isWRPRES) {
+    const type = feature?.properties?.type?.toLowerCase();
+
+    if (type === 'reservoir') {
+      zoomTargets.facilities.reservoir = ensureFeatureGroup(zoomTargets.facilities.reservoir);
+      zoomTargets.facilities.reservoir.addLayer(layer);
+    }
+
+    if (type === 'wrp') {
+      zoomTargets.facilities.wrp = ensureFeatureGroup(zoomTargets.facilities.wrp);
+      zoomTargets.facilities.wrp.addLayer(layer);
+    }
+
+    return;
+  }
+
+  const systemKey = getSystemKey(feature?.properties?.system);
+  if (!systemKey) return;
+
+  zoomTargets.systems[systemKey] = ensureFeatureGroup(zoomTargets.systems[systemKey]);
+  zoomTargets.systems[systemKey].addLayer(layer);
+}
+
+function zoomToLayer(targetName = 'all') {
+  if (!map) return;
+
+  const key = String(targetName ?? 'all').toLowerCase();
+  let targetLayer = null;
+
+  if (key === 'all') {
+    targetLayer = zoomTargets.all;
+  } else if (zoomTargets.systems[key]) {
+    targetLayer = zoomTargets.systems[key];
+  } else if (zoomTargets.facilities[key]) {
+    targetLayer = zoomTargets.facilities[key];
+  }
+
+  if (!targetLayer || !targetLayer.getLayers || targetLayer.getLayers().length === 0) {
+    console.warn(`No zoom target found for: ${targetName}`);
+    return;
+  }
+
+  map.fitBounds(targetLayer.getBounds(), { padding: [20, 20] });
+}
+
+function initZoomButtons() {
+  const zoomButtons = document.querySelectorAll('[data-zoom-target]');
+
+  zoomButtons.forEach((button) => {
+    button.addEventListener('click', () => {
+      const target = button.getAttribute('data-zoom-target');
+      zoomToLayer(target);
+    });
+  });
+}
+
+/* =======================
+   4) Charts
+======================= */
+
 function renderMiniBarChart(containerId, title, subtitle, rows) {
   const el = document.getElementById(containerId);
+  if (!el || !Array.isArray(rows) || rows.length === 0) return;
 
   const maxVal = Math.max(...rows.map((r) => r.value));
   const barsHtml = rows
@@ -85,110 +274,16 @@ function renderTarpCharts() {
     'Tunnel System Length',
     'Illustrative lengths (miles). Replace with your source values.',
     [
-      { label: 'Upper Des Plaines', value: 35, valueLabel: '35 mi', color: ' #7A4DA3' },
+      { label: 'Calumet', value: 45, valueLabel: '45 mi', color: '#7A4DA3' },
       { label: 'Des Plaines', value: 40, valueLabel: '40 mi', color: '#2C7FB8' },
-      { label: 'Calumet', value: 45, valueLabel: '45 mi', color: '#4C9A5F' },
+      { label: 'Mainstream', value: 50, valueLabel: '50 mi', color: '#4C9A5F' },
+      { label: 'Upper Des Plaines', value: 35, valueLabel: '35 mi', color: '#C65622' },
     ]
   );
 }
 
 /* =======================
-   1) App Config
-======================= */
-
-const CONFIG = {
-  map: {
-    center: [41.8781, -87.5],
-    zoom: 10,
-    basemapUrl: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
-    basemapAttribution:
-      '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors ' +
-      '&copy; <a href="https://carto.com/attributions">CARTO</a>',
-  },
-
-  data: {
-    tarpUrl: 'GGIS517/project/geoshape/TARP_NEW.geojson',
-    wrpresUrl: 'GGIS517/project/geoshape/WRPRES.geojson',
-  },
-
-  styles: {
-    defaultLine: {
-      color: '#4b5563',
-      weight: 4,
-      opacity: 0.9,
-    },
-
-    reservoir: {
-      radius: 8,
-      fillColor: '#c65622',
-      color: '#1F4E79',
-      weight: 1.6,
-      opacity: 1,
-      fillOpacity: 0.9,
-    },
-
-    wrp: {
-      radius: 11,
-      fillColor: '#d44444',
-      color: '#FFFFFF',
-      weight: 1.5,
-      opacity: 1,
-      fillOpacity: 0.95,
-    },
-
-    fallbackPoint: {
-      radius: 6,
-      color: "#555",
-      fillColor: "#888",
-      weight: 1,
-      opacity: 1,
-      fillOpacity: 0.6,
-    },
-  },
-
-  legend: {
-    position: 'topright',
-    title: 'TARP Infrastructure',
-  },
-};
-
-/* =======================
-   2) Global State
-======================= */
-
-let map = null;
-let legendControl = null;
-let legendDiv = null;
-
-/* =======================
-   3) Color Helpers
-======================= */
-
-// Stable color for each tunnel system
-function colorFromString(str) {
-  if (!str) return '#6b7280';
-
-  const s = str.toLowerCase();
-
-  if (s.includes('upper')) return '#7A4DA3';
-  if (s.includes('des plaines') || s.includes('desplaines'))return '#2C7FB8';
-  if (s.includes('calumet') || s === 'culmet' || s.includes('culmet')) return '#4C9A5F';
-
-  return '#6b7280';
-}
-
-function normalizeSystemName(name) {
-  const s = String(name ?? '').toLowerCase();
-
-  if (s.includes('upper des')) return 'Upper Des Plaines';
-  if (s.includes('des')) return 'Des Plaines';
-  if (s.includes('calumet') || s.includes('culmet')) return 'Calumet';
-
-  return String(name ?? '');
-}
-
-/* =======================
-   4) Legend
+   5) Legend
 ======================= */
 
 function renderLegend(systems = []) {
@@ -199,7 +294,7 @@ function renderLegend(systems = []) {
     .map((s) => normalizeSystemName(s))
     .filter((value, index, array) => array.indexOf(value) === index)
     .sort((a, b) => {
-      const order = ['Upper Des Plaines', 'Des Plaines', 'Calumet'];
+      const order = ['System 1', 'System 2', 'System 3', 'System 4'];
       return order.indexOf(a) - order.indexOf(b);
     });
 
@@ -215,7 +310,7 @@ function renderLegend(systems = []) {
                        border-radius:2px;
                        margin-right:8px;
                        vertical-align:middle;"></span>
-          <span>${escapeHtml(s)}</span>
+          <span>${escapeHtml(getSystemDisplayName(s))}</span>
         </div>`;
     })
     .join('');
@@ -251,7 +346,7 @@ function renderLegend(systems = []) {
           style="display:inline-block;
                  width:9px;
                  height:9px;
-                 background:#2F80ED;
+                 background:#c65622;
                  border:1.5px solid #1F4E79;
                  border-radius:50%;
                  box-sizing:border-box;
@@ -264,7 +359,7 @@ function renderLegend(systems = []) {
 }
 
 /* =======================
-   5) Map Initialization
+   6) Map Initialization
 ======================= */
 
 function initMap() {
@@ -283,7 +378,6 @@ function initMap() {
     L.DomEvent.disableScrollPropagation(legendDiv);
 
     renderLegend([]);
-
     return legendDiv;
   };
 
@@ -291,75 +385,81 @@ function initMap() {
 }
 
 /* =======================
-   6) Data Layers
+   7) Data Layers
 ======================= */
+
+function getTarpLineStyle(feature) {
+  const system = feature?.properties?.system;
+  return {
+    color: colorFromString(system),
+    weight: 4,
+    opacity: 0.9,
+  };
+}
+
+function getPointLayer(feature, latlng, isWRPRES) {
+  if (!isWRPRES) {
+    return L.circleMarker(latlng, CONFIG.styles.fallbackPoint);
+  }
+
+  const type = feature?.properties?.type?.toLowerCase();
+
+  if (type === 'reservoir') {
+    return L.circleMarker(latlng, CONFIG.styles.reservoir);
+  }
+
+  if (type === 'wrp') {
+    return L.marker(latlng, {
+      icon: L.divIcon({
+        className: 'wrp-square-icon',
+        iconSize: [14, 14],
+        iconAnchor: [7, 7],
+      }),
+    });
+  }
+
+  return L.circleMarker(latlng, CONFIG.styles.fallbackPoint);
+}
+
+function bindFeaturePopup(feature, layer, isWRPRES) {
+  if (isWRPRES && feature?.properties?.name) {
+    layer.bindPopup(escapeHtml(feature.properties.name));
+  }
+}
 
 function loadTarpLayers() {
   if (!map) return;
 
   const urls = [CONFIG.data.tarpUrl, CONFIG.data.wrpresUrl];
   const group = L.featureGroup().addTo(map);
+  allTarpLayersGroup = group;
   const systemSet = new Set();
 
-  function tarpStyleBySystem(feature) {
-    const system = feature?.properties?.system;
-    return {
-      color: colorFromString(system),
-      weight: 4,
-      opacity: 0.9,
-    };
-  }
-
   const loaders = urls.map((url) =>
-  fetch(url)
-      .then((r) => {
-        if (!r.ok) {
-          throw new Error("GeoJSON failed to load: " + url);
+    fetch(url)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`GeoJSON failed to load: ${url}`);
         }
-        return r.json();
+        return response.json();
       })
       .then((data) => {
         const isWRPRES = url.includes('WRPRES.geojson');
-        const isTARPNEW = url.includes('TARP_NEW.geojson');
+        const isTARPNEW = url.includes('TARP_NEW_4.geojson');
 
-        if (isTARPNEW && data && Array.isArray(data.features)) {
-          data.features.forEach((f) => {
-            const sys = f?.properties?.system;
-            if (sys) systemSet.add(normalizeSystemName(sys));
+        if (isTARPNEW && Array.isArray(data?.features)) {
+          data.features.forEach((feature) => {
+            const system = feature?.properties?.system;
+            if (system) systemSet.add(normalizeSystemName(system));
           });
         }
 
         const layer = L.geoJSON(data, {
-          style: isTARPNEW ? tarpStyleBySystem : CONFIG.styles.defaultLine,
-
-          pointToLayer: function (feature, latlng) {
-            if (!isWRPRES) {
-              return L.circleMarker(latlng, CONFIG.styles.fallbackPoint);
-            }
-
-            const type = feature?.properties?.type?.toLowerCase();
-
-            if (type === 'reservoir') {
-              return L.circleMarker(latlng, CONFIG.styles.reservoir);
-            }
-
-            if (type === 'wrp') {
-              return L.marker(latlng, {
-                icon: L.divIcon({
-                  className: 'wrp-square-icon',
-                  iconSize: [14, 14],
-                  iconAnchor: [7, 7],
-                }),
-              });
-            }
-
-            return L.circleMarker(latlng, CONFIG.styles.fallbackPoint);
-          },
-
-          onEachFeature: function (feature, layer) {
-            if (isWRPRES && feature?.properties?.name) {
-              layer.bindPopup(escapeHtml(feature.properties.name));
-            }
+          style: isTARPNEW ? getTarpLineStyle : CONFIG.styles.defaultLine,
+          pointToLayer: (feature, latlng) => getPointLayer(feature, latlng, isWRPRES),
+          onEachFeature: (feature, featureLayer) => {
+            bindFeaturePopup(feature, featureLayer, isWRPRES);
+            registerZoomTarget(feature, featureLayer, isWRPRES);
           },
         });
 
@@ -371,9 +471,7 @@ function loadTarpLayers() {
   Promise.all(loaders)
     .then(() => {
       if (group.getLayers().length) {
-        map.fitBounds(group.getBounds(), {
-          padding: [20, 20],
-        });
+        zoomToLayer('all');
       }
 
       renderLegend(Array.from(systemSet));
@@ -384,20 +482,20 @@ function loadTarpLayers() {
 }
 
 /* =======================
-   7) UI: Collapsibles
+   8) UI: Collapsibles
 ======================= */
 
 function initCollapsibles() {
   const contents = document.getElementsByClassName('collapse-content');
-  for (let c = 0; c < contents.length; c++) {
-    contents[c].style.display = 'none';
+  for (let i = 0; i < contents.length; i++) {
+    contents[i].style.display = 'none';
   }
 
-  const coll = document.getElementsByClassName('collapsible');
-  for (let i = 0; i < coll.length; i++) {
-    coll[i].setAttribute('aria-expanded', 'false');
+  const collapsibles = document.getElementsByClassName('collapsible');
+  for (let i = 0; i < collapsibles.length; i++) {
+    collapsibles[i].setAttribute('aria-expanded', 'false');
 
-    coll[i].addEventListener('click', function () {
+    collapsibles[i].addEventListener('click', function () {
       this.classList.toggle('active');
 
       const content = this.nextElementSibling;
@@ -411,7 +509,7 @@ function initCollapsibles() {
 }
 
 /* =======================
-   8) UI: Tabs
+   9) UI: Tabs
 ======================= */
 
 function openPage(pageName, elmnt) {
@@ -423,12 +521,12 @@ function openPage(pageName, elmnt) {
   }
 
   for (let i = 0; i < tablinks.length; i++) {
-    tablinks[i].style.backgroundColor = '';
+    tablinks[i].classList.remove('active');
   }
 
   const target = document.getElementById(pageName);
   if (target) target.style.display = 'block';
-  if (elmnt) elmnt.style.backgroundColor = '#555';
+  if (elmnt) elmnt.classList.add('active');
 }
 
 function openDefaultTab() {
@@ -437,17 +535,17 @@ function openDefaultTab() {
 }
 
 /* =======================
-   9) Initialize Everything
+   10) App Start
 ======================= */
 
 onReady(function () {
   initMap();
   loadTarpLayers();
-
   initCollapsibles();
   openDefaultTab();
-
   renderTarpCharts();
+  initZoomButtons();
 
   window.openPage = openPage;
+  window.zoomToLayer = zoomToLayer;
 });

@@ -290,24 +290,14 @@ footer p{
 
 /* ======================= Collapse ======================= */
 .collapsible{
-  background-color:#777;
-  color:#fff;
   cursor:pointer;
-  padding:18px;
   width:100%;
   border:none;
   text-align:left;
   outline:none;
-  font-size:15px;
-  border-radius: 8px;
-  margin: 8px 0;
 }
 
-.collapsible:hover,
-.collapsible.active{
-  background-color:#555;
-}
-
+/* ======================= Vertical Timeline ======================= */
 .collapse-content{
   display:none;
   background-color:#f1f1f1;
@@ -317,7 +307,6 @@ footer p{
   line-height:1.6;
 }
 
-/* ======================= Vertical Timeline ======================= */
 .vtl-wrap{ margin: 10px 0 4px; }
 .vtl-hint{ margin: 0 0 12px; color: #666; font-size: 13px; }
 
@@ -427,21 +416,55 @@ footer p{
   .vtl-item::before{ left: -18px; }
 }
 
-/* ======================= Tabs ======================= */
+/* ======================= Top Tabs ======================= */
 .tablink{
-  background-color:#555;
-  color:#fff;
+  background: linear-gradient(135deg, #4f7c74 0%, #5f9ea0 100%);
+  color:#ffffff;
   border:none;
   outline:none;
   cursor:pointer;
-  padding:8px 14px;
-  font-size:15px;
-  margin-right:6px;
-  border-radius:6px;
+  padding:12px 18px;
+  font-size:16px;
+  font-weight:700;
+  margin-right:10px;
+  border-radius:14px;
   display:inline-block;
+  box-shadow:0 6px 14px rgba(79, 124, 116, 0.20);
+  transition:transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
 }
 
-.tablink:hover{ background-color:#777; }
+.tablink:hover,
+.tablink.active{
+  filter:brightness(1.08);
+  transform:translateY(-1px);
+  box-shadow:0 10px 18px rgba(79, 124, 116, 0.26);
+}
+
+/* ======================= Content Buttons ======================= */
+.content-btn{
+  background: linear-gradient(150deg, #9b9b9b 0%, #c4d4d6 100%);
+  color:#ffffff;
+  cursor:pointer;
+  padding:18px 20px;
+  width:100%;
+  border:none;
+  text-align:left;
+  outline:none;
+  font-size:18px;
+  font-weight:700;
+  letter-spacing:0.2px;
+  border-radius:16px;
+  margin:12px 0;
+  box-shadow:0 8px 18px rgba(106, 144, 146, 0.18);
+  transition:transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+
+.content-btn:hover,
+.content-btn.active{
+  filter:brightness(1.06);
+  transform:translateY(-1px);
+  box-shadow:0 12px 24px rgba(106, 144, 146, 0.24);
+}
 
 .tabcontent{
   display:none;
@@ -452,6 +475,101 @@ footer p{
 #description-panel p{
   line-height: 1.45;
   margin: 10px 0;
+}
+
+/* ======================= Zoom to Layer Buttons ======================= */
+.zoom-controls{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin:12px 0 16px;
+}
+
+.zoom-btn,
+button[data-zoom-target]{
+  appearance:none;
+  -webkit-appearance:none;
+  border:none;
+  cursor:pointer;
+  padding:10px 14px;
+  border-radius:999px;
+  font-size:13px;
+  font-weight:700;
+  line-height:1.2;
+  color:#15423f;
+  background:linear-gradient(135deg, #e5f3ef 0%, #cfe5df 100%);
+  box-shadow:0 4px 10px rgba(21, 66, 63, 0.12);
+  transition:transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+}
+
+.zoom-btn:hover,
+.zoom-btn:focus-visible,
+button[data-zoom-target]:hover,
+button[data-zoom-target]:focus-visible{
+  transform:translateY(-1px);
+  filter:brightness(1.03);
+  box-shadow:0 8px 16px rgba(21, 66, 63, 0.18);
+  outline:none;
+}
+
+.zoom-btn:active,
+button[data-zoom-target]:active{
+  transform:translateY(0);
+  box-shadow:0 3px 8px rgba(21, 66, 63, 0.14);
+}
+
+.zoom-btn.all,
+button[data-zoom-target="all"]{
+  color:#ffffff;
+  background:linear-gradient(135deg, #0a5f86 0%, #000609 100%);
+}
+
+.zoom-btn.reservoir,
+button[data-zoom-target="reservoir"]{
+  background:linear-gradient(135deg, #dff2fb 0%, #b9dff3 100%);
+  color:#154c6a;
+}
+
+.zoom-btn.wrp,
+button[data-zoom-target="wrp"]{
+  background:linear-gradient(135deg, #fff4c7 0%, #f5df74 100%);
+  color:#5d4a00;
+}
+
+.zoom-btn.system1,
+button[data-zoom-target="system1"]{
+  background:linear-gradient(135deg, #e6d9f3 0%, #cdb4e8 100%);
+  color:#4e2f73;
+}
+
+.zoom-btn.system2,
+button[data-zoom-target="system2"]{
+  background:linear-gradient(135deg, #d7ecfb 0%, #a8d2f0 100%);
+  color:#174b73;
+}
+
+.zoom-btn.system3,
+button[data-zoom-target="system3"]{
+  background:linear-gradient(135deg, #dff4e4 0%, #b8dfc1 100%);
+  color:#1d5d35;
+}
+
+.zoom-btn.system4,
+button[data-zoom-target="system4"]{
+  background:linear-gradient(135deg, #f9e2ba 0%, #f0cc87 100%);
+  color:#6f4f18;
+}
+
+@media (max-width: 520px){
+  .zoom-controls{
+    gap:8px;
+  }
+
+  .zoom-btn,
+  button[data-zoom-target]{
+    width:100%;
+    justify-content:center;
+  }
 }
 
 /* ======================= Mini Charts ======================= */

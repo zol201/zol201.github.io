@@ -45,6 +45,9 @@
     </nav>
 
   <h2 style="text-align:center;">Project Overview</h2>
+  <p style="max-width: 1100px; margin: 10px auto 18px; padding: 0 16px; line-height: 1.6; color: #334155;">
+    This interactive map introduces Chicago’s Tunnel and Reservoir Plan (TARP), a major underground infrastructure system designed to reduce flooding and improve water quality. Use the zoom buttons in the side panel to explore individual tunnel systems and related facilities, then open each section to learn how the system works and why it matters.
+  </p>
 
   <!-- Map + Right Panel (same row) -->
   <div id="map-layout">
@@ -56,34 +59,68 @@
 
         <!-- Tab content -->
         <div id="System" class="tabcontent">
-            <button type="button" class="collapsible">Upper Des Plaines</button>
+            <div class="zoom-controls" aria-label="Zoom to layer controls">
+              <button type="button" class="zoom-btn all" data-zoom-target="all">Show All</button>
+              <button type="button" class="zoom-btn system4" data-zoom-target="system4">Upper Des Plaines</button>
+              <button type="button" class="zoom-btn system2" data-zoom-target="system2">Des Plaines</button>
+              <button type="button" class="zoom-btn system3" data-zoom-target="system3">Mainstream</button>
+              <button type="button" class="zoom-btn system1" data-zoom-target="system1">Calumet</button>
+            </div>
+            <button type="button" class="collapsible content-btn">Upper Des Plaines</button>
             <div class="collapse-content">
-              <p>
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Porro animi consequatur eveniet quae vitae. Ea ut aspernatur odit praesentium quaerat, expedita molestias magnam dolor eos perspiciatis necessitatibus dolore suscipit similique?
-              </p>
+              <ul>
+                <li><strong>Location:</strong> Near O’Hare Airport</li>
+                <li><strong>Scale:</strong> About 6.6 miles of tunnels</li>
+                <li><strong>Communities served:</strong> Arlington Heights, Des Plaines, and Mount Prospect</li>
+                <li><strong>Connected facility:</strong> Gloria Alitto Majewski Reservoir</li>
+                <li><strong>Why it matters:</strong> Helps reduce local flooding and capture sewer overflow</li>
+              </ul>
             </div>
 
-            <button type="button" class="collapsible">Des Plaines</button>
+            <button type="button" class="collapsible content-btn">Des Plaines</button>
             <div class="collapse-content">
-              <p>
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Amet, ipsa atque labore consectetur ratione ad quisquam repellat nostrum, at neque nulla, adipisci repudiandae laboriosam consequuntur dolores voluptatibus. Enim, aperiam ut.
-              </p>
+              <ul>
+                <li><strong>Location:</strong> Western and northwestern Chicago region</li>
+                <li><strong>Scale:</strong> About 26.6 miles of tunnels</li>
+                <li><strong>Connected facility:</strong> McCook Reservoir</li>
+                <li><strong>Main role:</strong> Stores excess stormwater and sewage during heavy rainfall</li>
+                <li><strong>Why it matters:</strong> Helps reduce street flooding and polluted overflow</li>
+              </ul>
             </div>
-            <button type="button" class="collapsible">Calumet</button>
+            <button type="button" class="collapsible content-btn">Mainstream</button>
             <div class="collapse-content">
-              <p>
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Amet, ipsa atque labore consectetur ratione ad quisquam repellat nostrum, at neque nulla, adipisci repudiandae laboriosam consequuntur dolores voluptatibus. Enim, aperiam ut.
-              </p>
+              <ul>
+                <li><strong>Scale:</strong> Largest tunnel system in TARP, about 40.5 miles long</li>
+                <li><strong>Service area:</strong> Covers a large part of the Chicago combined sewer area</li>
+                <li><strong>Connected facility:</strong> McCook Reservoir</li>
+                <li><strong>Main role:</strong> Captures large volumes of stormwater during major rain events</li>
+                <li><strong>Why it matters:</strong> One of the most important parts of the overall TARP network</li>
+              </ul>
+            </div>
+            <button type="button" class="collapsible content-btn">Calumet</button>
+            <div class="collapse-content">
+              <ul>
+                <li><strong>Location:</strong> Southern part of the TARP service area</li>
+                <li><strong>Scale:</strong> About 36.7 miles of tunnels</li>
+                <li><strong>Connected facility:</strong> Thornton Reservoir</li>
+                <li><strong>Main role:</strong> Helps manage stormwater and sewage during storms</li>
+                <li><strong>Why it matters:</strong> Supports both flood control and water quality protection</li>
+              </ul>
             </div>
         </div>
         <div id="TARP" class="tabcontent">
-            <button type="button" class="collapsible">What is TARP?</button>
+            <p>
+              This section introduces the TARP system in a simple story format: what the problem was, how the system works, when major parts were built, and why the project is important today.
+            </p>
+            <button type="button" class="collapsible content-btn">What is TARP?</button>
             <div class="collapse-content">
-              <p>
-                The Tunnel and Reservoir Plan (TARP), also known as the Chicago Deep Tunnel,
-                is a large-scale infrastructure system designed to reduce flooding
-                and improve water quality in the Chicago region.
-              </p>
+              <ul>
+                <li><strong>Full name:</strong> Tunnel and Reservoir Plan (TARP)</li>
+                <li><strong>Also called:</strong> Chicago Deep Tunnel</li>
+                <li><strong>Main purpose:</strong> Reduce flooding and improve water quality</li>
+                <li><strong>Problem addressed:</strong> In older parts of Chicago, stormwater and sewage share the same pipes</li>
+                <li><strong>Why it was needed:</strong> Heavy rain can overload the sewer system and cause overflow into streets, basements, and waterways</li>
+              </ul>
               <p>
                 <a href="https://mwrd.org/what-we-do/tunnel-and-reservoir-plan-tarp" target="_blank">
                   Learn more on official website
@@ -91,15 +128,17 @@
               </p>
             </div>
 
-            <button type="button" class="collapsible">How TARP Works</button>
+            <button type="button" class="collapsible content-btn">How TARP Works</button>
             <div class="collapse-content">
-              <p>
-                TARP helps prevent flooding by capturing excess stormwater and sewage
-                during heavy rainfall. The water is temporarily stored underground
-                and treated later, instead of overflowing into streets and rivers.
-              </p>
+              <ol>
+                <li>Heavy rain causes the sewer system to fill up.</li>
+                <li>Excess flow is diverted into deep tunnels.</li>
+                <li>Water is stored underground in tunnels and reservoirs.</li>
+                <li>Water reclamation plants treat the stored water when capacity is available.</li>
+                <li>Flooding and polluted overflow are reduced.</li>
+              </ol>
             </div>
-            <button type="button" class="collapsible">Timeline</button>
+            <button type="button" class="collapsible content-btn">Timeline</button>
             <div class="collapse-content">
 
               <div class="vtl-wrap" aria-label="TARP vertical timeline">
@@ -218,26 +257,38 @@
                 </ul>
               </div>
             </div>
-            <button type="button" class="collapsible">Reservoir Storage Capacity</button>
+            <button type="button" class="collapsible content-btn">Reservoir Storage Capacity</button>
             <div class="collapse-content">
               <div id="chart-reservoir-capacity"></div>
               <p style="margin-top:10px; font-size: 13px; color: #555;">
-                Source: MWRD project summaries. Values shown in billion gallons (BG).
+                This chart shows how much water each reservoir can store. Larger storage means greater ability to hold excess water during storms.
               </p>
             </div>
 
-            <button type="button" class="collapsible">Tunnel System Length</button>
+            <button type="button" class="collapsible content-btn">Tunnel System Length</button>
             <div class="collapse-content">
               <div id="chart-tunnel-length"></div>
               <p style="margin-top:10px; font-size: 13px; color: #555;">
-                Note: lengths are placeholders for now—replace with your referenced values.
+                This chart compares the length of each tunnel system so viewers can quickly see the scale differences across TARP.
               </p>
             </div>
-            <button type="button" class="collapsible">More Information</button>
+            <button type="button" class="collapsible content-btn">More Information</button>
             <div class="collapse-content">
-              <p>
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Amet, ipsa atque labore consectetur ratione ad quisquam repellat nostrum, at neque nulla, adipisci repudiandae laboriosam consequuntur dolores voluptatibus. Enim, aperiam ut.
-              </p>
+              <ul>
+                <li><strong>Total tunnel length:</strong> About 110 miles</li>
+                <li><strong>Total reservoir storage:</strong> About 15.15 billion gallons</li>
+                <li><strong>Service area:</strong> Roughly 352 square miles</li>
+                <li><strong>People served:</strong> About 3.75 million</li>
+                <li><strong>Project value:</strong> One of the largest civil engineering projects in the Chicago region</li>
+              </ul>
+            </div>
+            <button type="button" class="collapsible content-btn">Note</button>
+            <div class="collapse-content">
+              <ul>
+                <li>McCook Reservoir Stage 2 is still under construction and is the major unfinished part of the system.</li>
+                <li>TARP is not only a flood-control project; it also helps reduce combined sewer overflow pollution.</li>
+                <li>The map focuses on major systems and facilities, so it is an introduction rather than a full engineering inventory.</li>
+              </ul>
             </div>
         </div>
 
