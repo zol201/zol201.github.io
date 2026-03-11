@@ -56,6 +56,7 @@
         <!-- Tab buttons -->
         <button class="tablink" onclick="openPage('System', this)"id="defaultOpen">System</button>
         <button class="tablink" onclick="openPage('TARP', this)">TARP</button>
+        <button class="tablink" onclick="openPage('Statistics', this)">Charts & Details</button>
 
         <!-- Tab content -->
         <div id="System" class="tabcontent">
@@ -109,9 +110,6 @@
             </div>
         </div>
         <div id="TARP" class="tabcontent">
-            <p>
-              This section introduces the TARP system in a simple story format: what the problem was, how the system works, when major parts were built, and why the project is important today.
-            </p>
             <button type="button" class="collapsible content-btn">What is TARP?</button>
             <div class="collapse-content">
               <ul>
@@ -138,6 +136,28 @@
                 <li>Flooding and polluted overflow are reduced.</li>
               </ol>
             </div>
+
+            <button type="button" class="collapsible content-btn">More Information</button>
+            <div class="collapse-content">
+              <ul>
+                <li><strong>Total tunnel length:</strong> About 110 miles</li>
+                <li><strong>Total reservoir storage:</strong> About 15.15 billion gallons</li>
+                <li><strong>Service area:</strong> Roughly 352 square miles</li>
+                <li><strong>People served:</strong> About 3.75 million</li>
+                <li><strong>Project value:</strong> One of the largest civil engineering projects in the Chicago region</li>
+              </ul>
+            </div>
+            <button type="button" class="collapsible content-btn">Note</button>
+            <div class="collapse-content">
+              <ul>
+                <li>McCook Reservoir Stage 2 is still under construction and is the major unfinished part of the system.</li>
+                <li>TARP is not only a flood-control project; it also helps reduce combined sewer overflow pollution.</li>
+                <li>The map focuses on major systems and facilities, so it is an introduction rather than a full engineering inventory.</li>
+              </ul>
+            </div>
+        </div>
+<div id="Statistics" class="tabcontent">
+            
             <button type="button" class="collapsible content-btn">Timeline</button>
             <div class="collapse-content">
 
@@ -272,26 +292,8 @@
                 This chart compares the length of each tunnel system so viewers can quickly see the scale differences across TARP.
               </p>
             </div>
-            <button type="button" class="collapsible content-btn">More Information</button>
-            <div class="collapse-content">
-              <ul>
-                <li><strong>Total tunnel length:</strong> About 110 miles</li>
-                <li><strong>Total reservoir storage:</strong> About 15.15 billion gallons</li>
-                <li><strong>Service area:</strong> Roughly 352 square miles</li>
-                <li><strong>People served:</strong> About 3.75 million</li>
-                <li><strong>Project value:</strong> One of the largest civil engineering projects in the Chicago region</li>
-              </ul>
-            </div>
-            <button type="button" class="collapsible content-btn">Note</button>
-            <div class="collapse-content">
-              <ul>
-                <li>McCook Reservoir Stage 2 is still under construction and is the major unfinished part of the system.</li>
-                <li>TARP is not only a flood-control project; it also helps reduce combined sewer overflow pollution.</li>
-                <li>The map focuses on major systems and facilities, so it is an introduction rather than a full engineering inventory.</li>
-              </ul>
-            </div>
+            
         </div>
-
 
     </div>
   </div>

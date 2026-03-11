@@ -36,29 +36,20 @@ const CONFIG = {
 
     reservoir: {
       radius: 8,
-      fillColor: '#c65622',
-      color: '#1F4E79',
+      fillColor: '#1a9b0e',
+      color: '#f2f2f2',
       weight: 1.6,
       opacity: 1,
       fillOpacity: 0.9,
     },
 
-    wrp: {
-      radius: 11,
-      fillColor: '#d44444',
-      color: '#FFFFFF',
+    wrpSquare: {
+      size: 14,
+      fillColor: '#F2D64B',
+      color: '#333333',
       weight: 1.5,
       opacity: 1,
-      fillOpacity: 0.95,
-    },
-
-    fallbackPoint: {
-      radius: 6,
-      color: '#555',
-      fillColor: '#888',
-      weight: 1,
-      opacity: 1,
-      fillOpacity: 0.6,
+      fillOpacity: 1,
     },
   },
 
@@ -114,12 +105,12 @@ function escapeHtml(value) {
 function colorFromString(str) {
   if (!str) return '#6b7280';
 
-  const s = String(str).toLowerCase();
+  const s = String(str).toLowerCase().trim();
 
-  if (s.includes('calumet')) return '#7A4DA3';
-  if (s.includes('des plaines') && !s.includes('upper')) return '#2C7FB8';
-  if (s.includes('mainstream')) return '#4C9A5F';
-  if (s.includes('upper des plaines')) return '#C65622';
+  if (s.includes('calumet') || s === 'system 1' || s === 'system1') return '#7A4DA3';
+  if ((s.includes('des plaines') && !s.includes('upper')) || s === 'system 2' || s === 'system2') return '#2C7FB8';
+  if (s.includes('mainstream') || s === 'system 3' || s === 'system3') return '#4C9A5F';
+  if (s.includes('upper des plaines') || s === 'system 4' || s === 'system4') return '#C65622';
 
   return '#6b7280';
 }
@@ -286,6 +277,47 @@ function renderTarpCharts() {
    5) Legend
 ======================= */
 
+function getReservoirLegendStyle() {
+  const s = CONFIG.styles.reservoir;
+  const diameter = s.radius * 2;
+  return `
+    width:${diameter}px;
+    height:${diameter}px;
+    background:${s.fillColor};
+    border:${s.weight}px solid ${s.color};
+    border-radius:50%;
+    box-sizing:border-box;
+    opacity:${s.opacity};
+  `;
+}
+
+function getWRPSquareStyle() {
+  const s = CONFIG.styles.wrpSquare;
+  return `
+    width:${s.size}px;
+    height:${s.size}px;
+    background:${s.fillColor};
+    border:${s.weight}px solid ${s.color};
+    box-sizing:border-box;
+    opacity:${s.opacity};
+    border-radius:2px;
+  `;
+}
+
+function getReservoirMarkerStyle() {
+  const s = CONFIG.styles.reservoir;
+  const diameter = s.radius * 2;
+  return `
+    width:${diameter}px;
+    height:${diameter}px;
+    background:${s.fillColor};
+    border:${s.weight}px solid ${s.color};
+    border-radius:50%;
+    box-sizing:border-box;
+    opacity:${s.opacity};
+  `;
+}
+
 function renderLegend(systems = []) {
   if (!legendDiv) return;
 
@@ -300,13 +332,14 @@ function renderLegend(systems = []) {
 
   const systemsHtml = safeSystems
     .map((s) => {
+      const lineColor = colorFromString(s);
       return `
         <div class="legend-item">
           <span class="legend-line"
                 style="display:inline-block;
                        width:36px;
                        height:4px;
-                       background:${colorFromString(s)};
+                       background:${lineColor};
                        border-radius:2px;
                        margin-right:8px;
                        vertical-align:middle;"></span>
@@ -329,29 +362,16 @@ function renderLegend(systems = []) {
       <div class="legend-item" style="font-weight:600; margin-bottom:6px;">Facilities</div>
 
       <div class="legend-item">
-        <span
-          style="display:inline-block;
-                 width:11px;
-                 height:11px;
-                 background:#555555;
-                 border:1.5px solid #ffffff;
-                 box-sizing:border-box;
-                 margin-right:8px;
-                 vertical-align:middle;"></span>
+        <span style="display:inline-flex; align-items:center; justify-content:center; margin-right:8px; vertical-align:middle;">
+          <span style="${getWRPSquareStyle()}"></span>
+        </span>
         <span>Water Reclamation Plant</span>
       </div>
 
       <div class="legend-item">
-        <span
-          style="display:inline-block;
-                 width:9px;
-                 height:9px;
-                 background:#c65622;
-                 border:1.5px solid #1F4E79;
-                 border-radius:50%;
-                 box-sizing:border-box;
-                 margin-right:8px;
-                 vertical-align:middle;"></span>
+        <span style="display:inline-flex; align-items:center; justify-content:center; margin-right:8px; vertical-align:middle;">
+          <span style="${getReservoirLegendStyle()}"></span>
+        </span>
         <span>Reservoir</span>
       </div>
     </div>
@@ -397,6 +417,7 @@ function getTarpLineStyle(feature) {
   };
 }
 
+
 function getPointLayer(feature, latlng, isWRPRES) {
   if (!isWRPRES) {
     return L.circleMarker(latlng, CONFIG.styles.fallbackPoint);
@@ -405,15 +426,28 @@ function getPointLayer(feature, latlng, isWRPRES) {
   const type = feature?.properties?.type?.toLowerCase();
 
   if (type === 'reservoir') {
-    return L.circleMarker(latlng, CONFIG.styles.reservoir);
+    const s = CONFIG.styles.reservoir;
+    const diameter = s.radius * 2;
+
+    return L.marker(latlng, {
+      icon: L.divIcon({
+        className: 'reservoir-circle-icon',
+        iconSize: [diameter, diameter],
+        iconAnchor: [diameter / 2, diameter / 2],
+        html: `<div style="${getReservoirMarkerStyle()}"></div>`,
+      }),
+    });
   }
 
   if (type === 'wrp') {
+    const s = CONFIG.styles.wrpSquare;
+
     return L.marker(latlng, {
       icon: L.divIcon({
         className: 'wrp-square-icon',
-        iconSize: [14, 14],
-        iconAnchor: [7, 7],
+        iconSize: [s.size, s.size],
+        iconAnchor: [s.size / 2, s.size / 2],
+        html: `<div style="${getWRPSquareStyle()}"></div>`,
       }),
     });
   }
