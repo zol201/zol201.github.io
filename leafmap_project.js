@@ -36,7 +36,7 @@ const CONFIG = {
 
     reservoir: {
       radius: 8,
-      fillColor: '#0072B2',
+      fillColor: '#E6AB02',
       color: '#000000',
       weight: 1.6,
       opacity: 1,

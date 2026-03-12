@@ -581,7 +581,7 @@ button[data-zoom-target="system3"]{
 
 .zoom-btn.system4,
 button[data-zoom-target="system4"]{
-  background:linear-gradient(135deg, #f9e2ba 0%, #f0cc87 100%);
+  background:linear-gradient(135deg, #ffe6a1 0%, #faca3a 100%);
   color:#6f4f18;
 }
 
