@@ -289,8 +289,7 @@ footer p{
 }
 
 .legend-item > span:first-child > span[style*="border-radius:50%"]{
-  border:1.6px solid #f2f2f2 !important;
-  background:#1a9b0e !important;
+  border:1.6px solid ;
   opacity:1 !important;
   box-shadow:none !important;
 }

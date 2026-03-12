@@ -36,8 +36,8 @@ const CONFIG = {
 
     reservoir: {
       radius: 8,
-      fillColor: '#1a9b0e',
-      color: '#f2f2f2',
+      fillColor: '#0072B2',
+      color: '#000000',
       weight: 1.6,
       opacity: 1,
       fillOpacity: 0.9,
@@ -45,7 +45,7 @@ const CONFIG = {
 
     wrpSquare: {
       size: 14,
-      fillColor: '#F2D64B',
+      fillColor: '#8c510a',
       color: '#333333',
       weight: 1.5,
       opacity: 1,
@@ -107,10 +107,10 @@ function colorFromString(str) {
 
   const s = String(str).toLowerCase().trim();
 
-  if (s.includes('calumet') || s === 'system 1' || s === 'system1') return '#7A4DA3';
-  if ((s.includes('des plaines') && !s.includes('upper')) || s === 'system 2' || s === 'system2') return '#2C7FB8';
-  if (s.includes('mainstream') || s === 'system 3' || s === 'system3') return '#4C9A5F';
-  if (s.includes('upper des plaines') || s === 'system 4' || s === 'system4') return '#C65622';
+  if (s.includes('calumet') || s === 'system 4' || s === 'system4') return '#7550B3';
+  if ((s.includes('des plaines') && !s.includes('upper')) || s === 'system 2' || s === 'system2') return '#1F78B4';
+  if (s.includes('mainstream') || s === 'system 3' || s === 'system3') return '#1B9E77';
+  if (s.includes('upper des plaines') || s === 'system 1' || s === 'system1') return '#D95F02';
 
   return '#6b7280';
 }
@@ -118,10 +118,10 @@ function colorFromString(str) {
 function normalizeSystemName(name) {
   const s = String(name ?? '').toLowerCase();
 
-  if (s.includes('calumet')) return 'System 1';
+  if (s.includes('calumet')) return 'System 4';
   if (s.includes('des plaines') && !s.includes('upper')) return 'System 2';
   if (s.includes('mainstream')) return 'System 3';
-  if (s.includes('upper des plaines')) return 'System 4';
+  if (s.includes('upper des plaines')) return 'System 1';
 
   return String(name ?? '');
 }
@@ -129,10 +129,10 @@ function normalizeSystemName(name) {
 function getSystemDisplayName(name) {
   const normalized = normalizeSystemName(name);
 
-  if (normalized === 'System 1') return 'Calumet';
+  if (normalized === 'System 4') return 'Calumet';
   if (normalized === 'System 2') return 'Des Plaines';
   if (normalized === 'System 3') return 'Mainstream';
-  if (normalized === 'System 4') return 'Upper Des Plaines';
+  if (normalized === 'System 1') return 'Upper Des Plaines';
 
   return String(name ?? '');
 }
