@@ -251,24 +251,23 @@ function renderTarpCharts() {
   renderMiniBarChart(
     'chart-reservoir-capacity',
     'Reservoir Storage Capacity',
-    'Approx. storage (billion gallons).',
+    'Storage capacity (billion gallons).',
     [
       { label: 'Majewski', value: 0.35, valueLabel: '0.35 BG', color: '#2F80ED' },
-      { label: 'Thornton', value: 7.9, valueLabel: '7.9 BG', color: '#2F80ED' },
-      { label: 'McCook Stage 1', value: 3.5, valueLabel: '3.5 BG', color: '#2F80ED' },
-      { label: 'McCook Stage 2 (Est.)', value: 6.5, valueLabel: '6.5 BG', color: '#2F80ED' },
+      { label: 'Thornton', value: 4.8, valueLabel: '4.8 BG', color: '#2F80ED' },
+      { label: 'McCook', value: 10.0, valueLabel: '10.0 BG', color: '#2F80ED' },
     ]
   );
 
   renderMiniBarChart(
     'chart-tunnel-length',
     'Tunnel System Length',
-    'Illustrative lengths (miles). Replace with your source values.',
+    'Tunnel length (miles).',
     [
-      { label: 'Calumet', value: 45, valueLabel: '45 mi', color: '#7A4DA3' },
-      { label: 'Des Plaines', value: 40, valueLabel: '40 mi', color: '#2C7FB8' },
-      { label: 'Mainstream', value: 50, valueLabel: '50 mi', color: '#4C9A5F' },
-      { label: 'Upper Des Plaines', value: 35, valueLabel: '35 mi', color: '#C65622' },
+      { label: 'Calumet', value: 36.7, valueLabel: '36.7 mi', color: '#7A4DA3' },
+      { label: 'Des Plaines', value: 26.6, valueLabel: '26.6 mi', color: '#2C7FB8' },
+      { label: 'Mainstream', value: 40.5, valueLabel: '40.5 mi', color: '#4C9A5F' },
+      { label: 'Upper Des Plaines', value: 6.6, valueLabel: '6.6 mi', color: '#C65622' },
     ]
   );
 }
