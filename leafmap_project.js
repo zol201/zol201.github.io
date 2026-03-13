@@ -264,10 +264,10 @@ function renderTarpCharts() {
     'Tunnel System Length',
     'Tunnel length (miles).',
     [
-      { label: 'Calumet', value: 36.7, valueLabel: '36.7 mi', color: '#7A4DA3' },
+      { label: 'Upper Des Plaines', value: 6.6, valueLabel: '6.6 mi', color: '#C65622' },
       { label: 'Des Plaines', value: 26.6, valueLabel: '26.6 mi', color: '#2C7FB8' },
       { label: 'Mainstream', value: 40.5, valueLabel: '40.5 mi', color: '#4C9A5F' },
-      { label: 'Upper Des Plaines', value: 6.6, valueLabel: '6.6 mi', color: '#C65622' },
+      { label: 'Calumet', value: 36.7, valueLabel: '36.7 mi', color: '#7A4DA3' },
     ]
   );
 }
