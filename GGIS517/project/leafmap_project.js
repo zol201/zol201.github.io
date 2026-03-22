@@ -34,6 +34,8 @@ const CONFIG = {
 
 /* ===================== GLOBAL ===================== */
 let map;
+let legendControl;
+let legendDiv;
 let zoomTargets = {
   all: null,
   system1: null,
@@ -61,6 +63,18 @@ function initMap() {
   L.tileLayer(CONFIG.map.basemapUrl, {
     attribution: CONFIG.map.basemapAttribution,
   }).addTo(map);
+
+  legendControl = L.control({ position: 'topright' });
+
+  legendControl.onAdd = function () {
+    legendDiv = L.DomUtil.create('div', 'legend');
+    L.DomEvent.disableClickPropagation(legendDiv);
+    L.DomEvent.disableScrollPropagation(legendDiv);
+    renderLegend();
+    return legendDiv;
+  };
+
+  legendControl.addTo(map);
 }
 
 /* ===================== LOAD DATA ===================== */
@@ -108,11 +122,67 @@ function getSystemColor(system) {
   return '#999';
 }
 
+function renderLegend() {
+  if (!legendDiv) return;
+
+  legendDiv.innerHTML = `
+    <div class="legend-title">TARP Infrastructure</div>
+
+    <div class="legend-group">
+      <div class="legend-group-title">Tunnel Systems</div>
+
+      <div class="legend-item">
+        <span class="legend-line" style="background:#D95F02;"></span>
+        <span>Upper Des Plaines</span>
+      </div>
+
+      <div class="legend-item">
+        <span class="legend-line" style="background:#1F78B4;"></span>
+        <span>Des Plaines</span>
+      </div>
+
+      <div class="legend-item">
+        <span class="legend-line" style="background:#1B9E77;"></span>
+        <span>Mainstream</span>
+      </div>
+
+      <div class="legend-item">
+        <span class="legend-line" style="background:#7550B3;"></span>
+        <span>Calumet</span>
+      </div>
+    </div>
+
+    <hr class="legend-sep">
+
+    <div class="legend-group">
+      <div class="legend-group-title">Facilities</div>
+
+      <div class="legend-item">
+        <span style="display:inline-block;width:14px;height:14px;background:#8c510a;border:1.5px solid #333333;"></span>
+        <span>Water Reclamation Plant</span>
+      </div>
+
+      <div class="legend-item">
+        <span style="display:inline-block;width:16px;height:16px;background:#E6AB02;border:1.6px solid #000000;border-radius:50%;"></span>
+        <span>Reservoir</span>
+      </div>
+    </div>
+  `;
+}
+
+function isReservoirFeature(feature) {
+  const props = feature?.properties || {};
+  const typeValue = String(props.type ?? props.Type ?? '').toLowerCase().trim();
+  const nameValue = String(props.name ?? props.Name ?? '').toLowerCase().trim();
+
+  return typeValue.includes('reservoir') || nameValue.includes('reservoir');
+}
+
 /* ===================== POINT ===================== */
 function createPoint(feature, latlng) {
-  const type = feature.properties.type;
+  const isReservoir = isReservoirFeature(feature);
 
-  if (type === 'reservoir') {
+  if (isReservoir) {
     return L.circleMarker(latlng, {
       radius: CONFIG.styles.reservoir.radius,
       fillColor: CONFIG.styles.reservoir.fillColor,
@@ -124,11 +194,16 @@ function createPoint(feature, latlng) {
 
   return L.marker(latlng, {
     icon: L.divIcon({
+      className: 'wrp-square-icon',
+      iconSize: [CONFIG.styles.wrp.size, CONFIG.styles.wrp.size],
+      iconAnchor: [CONFIG.styles.wrp.size / 2, CONFIG.styles.wrp.size / 2],
       html: `<div style="
         width:${CONFIG.styles.wrp.size}px;
         height:${CONFIG.styles.wrp.size}px;
         background:${CONFIG.styles.wrp.fillColor};
         border:${CONFIG.styles.wrp.weight}px solid ${CONFIG.styles.wrp.color};
+        box-sizing:border-box;
+        border-radius:2px;
       "></div>`,
     }),
   });
