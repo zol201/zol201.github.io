@@ -183,16 +183,21 @@ function createPoint(feature, latlng) {
   const isReservoir = isReservoirFeature(feature);
 
   if (isReservoir) {
-    return L.circleMarker(latlng, {
+    const layer = L.circleMarker(latlng, {
       radius: CONFIG.styles.reservoir.radius,
       fillColor: CONFIG.styles.reservoir.fillColor,
       color: CONFIG.styles.reservoir.color,
       weight: CONFIG.styles.reservoir.weight,
       fillOpacity: 0.9,
     });
+
+    const name = feature.properties.name || feature.properties.Name || 'Reservoir';
+    layer.bindPopup(name);
+
+    return layer;
   }
 
-  return L.marker(latlng, {
+  const marker = L.marker(latlng, {
     icon: L.divIcon({
       className: 'wrp-square-icon',
       iconSize: [CONFIG.styles.wrp.size, CONFIG.styles.wrp.size],
@@ -207,6 +212,11 @@ function createPoint(feature, latlng) {
       "></div>`,
     }),
   });
+
+  const name = feature.properties.name || feature.properties.Name || 'WRP';
+  marker.bindPopup(name);
+
+  return marker;
 }
 
 /* ===================== ZOOM ===================== */
