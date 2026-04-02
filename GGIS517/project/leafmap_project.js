@@ -276,16 +276,16 @@ function initCollapsible() {
 /* ===================== CHART ===================== */
 function renderCharts() {
   renderBar("chart-reservoir-capacity", [
-    { label: "Majewski", value: 0.35 },
-    { label: "Thornton", value: 4.8 },
-    { label: "McCook", value: 10 },
+    { label: "Majewski", value: 0.35, valueLabel: "0.35 BG" },
+    { label: "Thornton", value: 4.8, valueLabel: "4.8 BG" },
+    { label: "McCook", value: 10, valueLabel: "10.0 BG" },
   ]);
 
   renderBar("chart-tunnel-length", [
-    { label: "Upper", value: 6.6 },
-    { label: "Des Plaines", value: 26.6 },
-    { label: "Mainstream", value: 40.5 },
-    { label: "Calumet", value: 36.7 },
+    { label: "Upper", value: 6.6, valueLabel: "6.6 mi" },
+    { label: "Des Plaines", value: 26.6, valueLabel: "26.6 mi" },
+    { label: "Mainstream", value: 40.5, valueLabel: "40.5 mi" },
+    { label: "Calumet", value: 36.7, valueLabel: "36.7 mi" },
   ]);
 }
 
@@ -296,11 +296,12 @@ function renderBar(id, data) {
   const max = Math.max(...data.map(d => d.value));
 
   el.innerHTML = data.map(d => `
-    <div style="display:flex;align-items:center;margin:6px 0;">
-      <div style="width:120px">${d.label}</div>
-      <div style="flex:1;background:#ddd;height:10px;">
-        <div style="width:${(d.value / max) * 100}%;background:#4CAF50;height:100%;"></div>
+    <div style="display:grid;grid-template-columns:120px 1fr 70px;align-items:center;gap:10px;margin:8px 0;">
+      <div>${d.label}</div>
+      <div style="background:#ddd;height:10px;border-radius:999px;overflow:hidden;">
+        <div style="width:${(d.value / max) * 100}%;background:#4CAF50;height:100%;border-radius:999px;"></div>
       </div>
+      <div style="text-align:right;font-size:12px;">${d.valueLabel || d.value}</div>
     </div>
   `).join("");
 }
